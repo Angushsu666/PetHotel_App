@@ -82,6 +82,7 @@ class _settingsState extends ConsumerState<settings> {
               controller: _nameContorller,
             ),
             //Update Name
+            //setting.dart要檢查名字有沒有重複！！！！！！！！！！
             TextButton(
                 onPressed: () {
                   ref

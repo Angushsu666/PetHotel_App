@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../components/navigator.dart';
 import '../providers/user_provider.dart';
+
 import 'setting.dart';
 import 'shopSetting.dart';
 
@@ -11,6 +12,7 @@ class MorePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     LocalUser currentUser = ref.watch(userProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('MorePage'),
@@ -57,9 +59,7 @@ class MorePage extends ConsumerWidget {
                       // print('設定商家資料');
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                ShopSettings()), 
+                        MaterialPageRoute(builder: (context) => ShopSettings()),
                       );
                       //顯示商家資料設定頁面或相關操作
                     } else {
@@ -92,6 +92,7 @@ class MorePage extends ConsumerWidget {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
+                //還未做
                 MoreButton(title: '折扣碼', onPressed: () {}),
                 MoreButton(title: '邀請朋友', onPressed: () {}),
               ],

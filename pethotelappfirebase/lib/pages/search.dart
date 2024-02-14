@@ -10,18 +10,30 @@ import 'sortPetHotel.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class SearchPage extends ConsumerWidget {
-  const SearchPage({Key? key}) : super(key: key);
+  SearchPage({Key? key}) : super(key: key);
+
+  // static bool _shopsFetched = false; // 使用静态变量来全局跟踪是否已获取数据
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = ref.watch(shopsProvider.notifier);
-    final allShops = ref.watch(shopsProvider);
+    // 只在数据未加载时调用fetchShops
+
+    notifier.fetchShops(); // 获取商店数据
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'Home 選擇你要的服務',
           style: TextStyle(color: Color.fromARGB(255, 226, 160, 182)),
         ),
-        backgroundColor: Color.fromARGB(255, 226, 160, 182), // 更改AppBar的背景顏色
+        backgroundColor: Color.fromARGB(255, 226, 160, 182),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         actions: [
           TextButton(
             onPressed: () {
@@ -38,50 +50,50 @@ class SearchPage extends ConsumerWidget {
       body: Column(
         children: [
           //測試商店列表
-          Container(
-            child: InkWell(
-              onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //       builder: (context) => ShopListPage()), // 導航到 ShopListPage
-                // );
-              },
-              child: Container(
-                width: 120,
-                height: 50,
-                color: Color.fromARGB(255, 226, 160, 182),
-                child: const Center(
-                  child: Text(
-                    '前往商店列表頁面',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
-            ),
-          ),
-                    Container(
-            child: InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => Home()), 
-                );
-              },
-              child: Container(
-                width: 120,
-                height: 50,
-                color: Color.fromARGB(255, 226, 160, 182),
-                child: const Center(
-                  child: Text(
-                    'Home page',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
-            ),
-          ),
+          // Container(
+          //   child: InkWell(
+          //     onTap: () {
+          //       // Navigator.push(
+          //       //   context,
+          //       //   MaterialPageRoute(
+          //       //       builder: (context) => ShopListPage()), // 導航到 ShopListPage
+          //       // );
+          //     },
+          //     child: Container(
+          //       width: 120,
+          //       height: 50,
+          //       color: Color.fromARGB(255, 226, 160, 182),
+          //       child: const Center(
+          //         child: Text(
+          //           '前往商店列表頁面',
+          //           style: TextStyle(color: Colors.white),
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          // ),
+          //           Container(
+          //   child: InkWell(
+          //     onTap: () {
+          //       Navigator.push(
+          //         context,
+          //         MaterialPageRoute(
+          //             builder: (context) => Home()),
+          //       );
+          //     },
+          //     child: Container(
+          //       width: 120,
+          //       height: 50,
+          //       color: Color.fromARGB(255, 226, 160, 182),
+          //       child: const Center(
+          //         child: Text(
+          //           'Home page',
+          //           style: TextStyle(color: Colors.white),
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          // ),
           //服務列表
           Expanded(
             child: Align(
@@ -90,15 +102,39 @@ class SearchPage extends ConsumerWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: CustomButton(
+                    child:
+                        // CustomButton(
+                        //   iconAsset: 'assets/home.svg',
+                        //   label: '寵物旅館住宿',
+                        //   onPressed: () {
+                        //     notifier
+                        //         .fetchShops(); // Call fetchShops from the notifier
+                        //     List<petShop> filteredShops = allShops
+                        //         .where((shop) =>
+                        //             shop.busItem.contains('C') ||
+                        //             shop.busItem.contains('BC') ||
+                        //             shop.busItem.contains('ABC'))
+                        //         .toList();
+                        //     Navigator.push(
+                        //       context,
+                        //       MaterialPageRoute(
+                        //         builder: (context) =>
+                        //             SortPetHotel(shops: filteredShops),
+                        //       ),
+                        //     );
+                        //   },
+                        // ),
+                        CustomButton(
                       iconAsset: 'assets/home.svg',
                       label: '寵物旅館住宿',
-                      allShops: allShops,
-                      onPressed: () {
-                        notifier
-                            .fetchShops(); // Call fetchShops from the notifier
-                        List<petShop> filteredShops = allShops
-                            .where((shop) => shop.busItem == 'C')
+                      onPressed: () async {
+                        List<petShop> firestoreShops = await notifier
+                            .fetchFirestoreShops(); // 获取最新的 Firestore 数据
+                        List<petShop> filteredShops = firestoreShops
+                            .where((shop) =>
+                                shop.busItem.contains('C') ||
+                                shop.busItem.contains('BC') ||
+                                shop.busItem.contains('ABC'))
                             .toList();
                         Navigator.push(
                           context,
@@ -116,45 +152,55 @@ class SearchPage extends ConsumerWidget {
                   //   child: CustomButton(
                   //     iconAsset: 'assets/paw3.svg',
                   //     label: '寵物日托安親',
-                  //     allShops: allShops, // 傳遞所有商店的資料
                   //     onPressed: () {
                   //       // 在這裡執行按鈕被點擊時的操作
                   //     },
                   //   ),
                   // ),
-                  // Padding(
-                  //   padding: const EdgeInsets.all(8.0),
-                  //   child: CustomButton(
-                  //     iconAsset: 'assets/bathing.svg',
-                  //     label: '寵物美容洗澡',
-                  //     allShops: allShops, // 傳遞所有商店的資料
-                  //     onPressed: () {
-                  //       // 在這裡執行按鈕被點擊時的操作
-                  //     },
-                  //   ),
-                  // ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: CustomButton(
+                      iconAsset: 'assets/bathing.svg',
+                      label: '寵物美容洗澡',
+                      onPressed: () async {
+                        List<petShop> firestoreShops = await notifier
+                            .fetchFirestoreShops(); // 获取最新的 Firestore 数据
+                        List<petShop> filteredShops = firestoreShops
+                            .where((shop) =>
+                                shop.busItem.contains('C') ||
+                                shop.busItem.contains('BC') ||
+                                shop.busItem.contains('ABC'))
+                            .toList();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                SortPetHotel(shops: filteredShops),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                   // Padding(
                   //   padding: const EdgeInsets.all(8.0),
                   //   child: CustomButton(
                   //     iconAsset: 'assets/scissor.svg',
                   //     label: '寵物美容剪毛',
-                  //     allShops: allShops, // 傳遞所有商店的資料
                   //     onPressed: () {
                   //       // 在這裡執行按鈕被點擊時的操作
                   //     },
                   //   ),
                   // ),
-                  // Padding(
-                  //   padding: const EdgeInsets.all(8.0),
-                  //   child: CustomButton(
-                  //     iconAsset: 'assets/pets.svg',
-                  //     label: '寵物繁殖買賣',
-                  //     allShops: allShops, // 傳遞所有商店的資料
-                  //     onPressed: () {
-                  //       // 在這裡執行按鈕被點擊時的操作
-                  //     },
-                  //   ),
-                  // ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: CustomButton(
+                      iconAsset: 'assets/pets.svg',
+                      label: '寵物繁殖買賣',
+                      onPressed: () {
+                        // 在這裡執行按鈕被點擊時的操作
+                      },
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -170,13 +216,11 @@ class CustomButton extends StatelessWidget {
   final String iconAsset;
   final String label;
   final VoidCallback onPressed;
-  final List<petShop> allShops;
 
   CustomButton({
     required this.iconAsset,
     required this.label,
     required this.onPressed,
-    required this.allShops,
   });
 
   @override

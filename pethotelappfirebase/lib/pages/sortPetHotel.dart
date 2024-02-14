@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-// import '../pages/selectPage.dart';
+import '../pages/select.dart';
 import '../models/petshop.dart';
+import 'filterPetHotel.dart';
 
 class SortPetHotel extends StatefulWidget {
   final List<petShop> shops;
@@ -13,26 +14,20 @@ class SortPetHotel extends StatefulWidget {
 
 class _SortPetHotelState extends State<SortPetHotel> {
   List<petShop> sortedShops = [];
+  List<petShop> initialShops = []; // 存储最初的 sortedShops
+
   String selectedCategory = '寵物種類';
   String? selectedAnimalType;
   String? selectedLocation;
 
-  // Map<String, String> locationMap = {
-  //   'A090': '桃園市',
-  //   'A020': '新北市',
-  //   // 其他地點的映射
-  // };
   @override
   void initState() {
     super.initState();
     sortedShops = List.from(widget.shops);
+    initialShops = List.from(widget.shops); // 存储最初的 sortedShops
   }
 
   void sortShops() {
-    // print('selectedCategory: $selectedCategory');
-    // print('selectedAnimalType: $selectedAnimalType');
-    // print('selectedLocation: $selectedLocation');
-
     setState(() {
       sortedShops = widget.shops.where((shop) {
         if (selectedLocation != null && selectedAnimalType != null) {
@@ -45,8 +40,6 @@ class _SortPetHotelState extends State<SortPetHotel> {
         }
         return false;
       }).toList();
-
-      // print('sortedShops: $sortedShops'); // 打印篩選後的商店列表
     });
   }
 
@@ -55,11 +48,32 @@ class _SortPetHotelState extends State<SortPetHotel> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '排序後的寵物旅館列表',
+          '寵物旅館搜尋結果',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Color.fromARGB(255, 226, 160, 182), // 更改AppBar的背景顏色
+        backgroundColor: Color.fromARGB(255, 226, 160, 182),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.filter_list),
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      FilterConditionsPage(sortedShops: initialShops),
+                ),
+              );
+
+              if (result != null) {
+                setState(() {
+                  sortedShops = List.from(result);
+                });
+              }
+            },
+          ),
+        ],
       ),
+      backgroundColor: Color.fromARGB(255, 226, 160, 182),
       body: Column(
         children: [
           Row(
@@ -74,7 +88,7 @@ class _SortPetHotelState extends State<SortPetHotel> {
                     selectedLocation = value;
                   });
                 },
-                 items: const [
+                items: const [
                   DropdownMenuItem<String>(
                     value: 'A010',
                     child: Text('台北市'),
@@ -163,21 +177,44 @@ class _SortPetHotelState extends State<SortPetHotel> {
               itemCount: sortedShops.length,
               itemBuilder: (context, index) {
                 final shop = sortedShops[index];
+                // 将每个房型的可用性转换为字符串，如果为 false 则显示 "无"
+                String roomsInfo = shop.roomCollection.entries
+                    .map((entry) => '${entry.key}: ${entry.value ? "有" : "无"}')
+                    .join(', ');
+
+                // 转换食物选择、服务及设施和医疗服务的 Map 为字符串
+                String foodChoices = shop.foodChoice.entries
+                     .map((entry) => '${entry.key}: ${entry.value ? "有" : "无"}')
+                    .join(', ');
+                String servicesAndFacilities = shop.serviceAndFacilities.entries
+                     .map((entry) => '${entry.key}: ${entry.value ? "有" : "无"}')
+                    .join(', ');
+                String medicalServices = shop.medicalNeeds.entries
+                     .map((entry) => '${entry.key}: ${entry.value ? "有" : "无"}')
+                    .join(', ');
+
                 return ListTile(
                   title: Text(shop.legalName),
                   subtitle: Text(
-                      '${shop.busItem} - ${shop.legalType} - ${shop.animalType} - UID:${shop.uid}'),
+                      '${shop.busItem}  - ${shop.animalType} '
+                      // - ${shop.legalType}
+                      //  - UID: ${shop.uid} \n
+                      // '寵物房型: $roomsInfo \n '
+                      // '食物選擇: $foodChoices  \n '
+                      // '服務及設施: $servicesAndFacilities \n '
+                      // '醫療服務: $medicalServices /'
+                      ),
                   trailing: ElevatedButton(
                     onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //       builder: (context) => SelectPage(shop: shop)),
-                      // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SelectPage(shop: shop)),
+                      );
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(
-                          Color.fromARGB(255, 226, 160, 182)), // 設置背景顏色為藍色
+                          Color.fromARGB(255, 226, 160, 182)), // 设置背景颜色
                     ),
                     child: Text(
                       '選擇服務',

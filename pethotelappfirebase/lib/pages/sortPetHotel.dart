@@ -179,30 +179,29 @@ class _SortPetHotelState extends State<SortPetHotel> {
                 final shop = sortedShops[index];
                 // 将每个房型的可用性转换为字符串，如果为 false 则显示 "无"
                 String roomsInfo = shop.roomCollection.entries
-                    .map((entry) => '${entry.key}: ${entry.value ? "有" : "无"}')
+                    .map((entry) => '${entry.key}: ${entry.value ? "有" : "無"}')
                     .join(', ');
 
                 // 转换食物选择、服务及设施和医疗服务的 Map 为字符串
                 String foodChoices = shop.foodChoice.entries
-                     .map((entry) => '${entry.key}: ${entry.value ? "有" : "无"}')
+                    .map((entry) => '${entry.key}: ${entry.value ? "有" : "無"}')
                     .join(', ');
                 String servicesAndFacilities = shop.serviceAndFacilities.entries
-                     .map((entry) => '${entry.key}: ${entry.value ? "有" : "无"}')
+                    .map((entry) => '${entry.key}: ${entry.value ? "有" : "無"}')
                     .join(', ');
                 String medicalServices = shop.medicalNeeds.entries
-                     .map((entry) => '${entry.key}: ${entry.value ? "有" : "无"}')
+                    .map((entry) => '${entry.key}: ${entry.value ? "有" : "無"}')
                     .join(', ');
 
                 return ListTile(
                   title: Text(shop.legalName),
-                  subtitle: Text(
-                      '${shop.busItem}  - ${shop.animalType} '
-                      // - ${shop.legalType}
+                  subtitle: Text('服務寵物：${shop.animalType}\n'
+                      //${shop.busItem} - ${shop.legalType}
                       //  - UID: ${shop.uid} \n
-                      // '寵物房型: $roomsInfo \n '
-                      // '食物選擇: $foodChoices  \n '
-                      // '服務及設施: $servicesAndFacilities \n '
-                      // '醫療服務: $medicalServices /'
+                      // '寵物房型: $roomsInfo\n'
+                      // '食物選擇: $foodChoices\n'
+                      // '服務及設施: $servicesAndFacilities\n'
+                      '醫療服務: $medicalServices'
                       ),
                   trailing: ElevatedButton(
                     onPressed: () {

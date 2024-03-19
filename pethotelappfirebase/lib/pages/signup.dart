@@ -29,8 +29,8 @@ class _SignUp extends ConsumerState <SignUp> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               const Icon(
-                FontAwesomeIcons.android,
-                color: Colors.blue,
+                FontAwesomeIcons.dog,
+                color: Color.fromARGB(255, 255, 195, 171),
                 size: 70,
               ),
               const Text(
@@ -38,7 +38,7 @@ class _SignUp extends ConsumerState <SignUp> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue,
+                  color: Color.fromARGB(255, 255, 195, 171),
                 ),
               ),
               Container(
@@ -60,7 +60,7 @@ class _SignUp extends ConsumerState <SignUp> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "please enter your email";
+                      return "請輸入電子信箱";
                     } else if (!emailValid.hasMatch(value)) {
                       return "請輸入完整電子信箱 ex. example@gmail.com";
                     } //輸入值不是空且不符合 emailValid 正則表達式所定義的電子郵件格式
@@ -101,7 +101,7 @@ class _SignUp extends ConsumerState <SignUp> {
                 width: 250,
                 height: 50,
                 decoration: BoxDecoration(
-                    color: Colors.blue,
+                    color: Color.fromARGB(255, 255, 195, 171),
                     borderRadius: BorderRadius.circular(30)),
                 child: TextButton(
                   onPressed: () async {
@@ -123,7 +123,7 @@ class _SignUp extends ConsumerState <SignUp> {
                     }
                   },
                   child: const Text(
-                    'create new account',
+                    '註冊用戶帳號',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -136,7 +136,7 @@ class _SignUp extends ConsumerState <SignUp> {
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: const Text('cancel'),
+                child: const Text('已有帳號'),
               )
             ],
           )),

@@ -15,7 +15,7 @@ class MorePage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('MorePage'),
+        title: Text('更多'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {

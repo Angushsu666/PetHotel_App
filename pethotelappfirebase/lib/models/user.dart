@@ -9,7 +9,7 @@ class FirebaseUser {
   final String email;
   final String name;
   final String profilePic;
-  final bool isShopOwner; // 新增布爾值字段
+  final bool isShopOwner; // 新增bool字段
   final List<petShop> shops; // user擁有的店家
 
   const FirebaseUser({

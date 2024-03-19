@@ -55,7 +55,26 @@ class Review {
       content: map['content'],
       rating: (map['rating'] as num).toDouble(),
       reviewTimestamp: DateTime.parse(map['reviewTimestamp']),
-      shopResponse: map['shopResponse'] != null ? Response.fromMap(map['shopResponse']) : null,
+      shopResponse: map['shopResponse'] != null
+          ? Response.fromMap(map['shopResponse'])
+          : null,
+    );
+  }
+
+  // 添加 copyWith 方法
+  Review copyWith({
+    String? author,
+    String? content,
+    double? rating,
+    DateTime? reviewTimestamp,
+    Response? shopResponse,
+  }) {
+    return Review(
+      author: author ?? this.author,
+      content: content ?? this.content,
+      rating: rating ?? this.rating,
+      reviewTimestamp: reviewTimestamp ?? this.reviewTimestamp,
+      shopResponse: shopResponse ?? this.shopResponse,
     );
   }
 }
@@ -86,9 +105,9 @@ class petShop {
   final String introduction;
   final String serviceIntroduction;
   final List<Review> reviews;
-  
+
   // 改为 Map<String, bool> 类型
-  final Map<String, bool> roomCollection; 
+  final Map<String, bool> roomCollection;
   final Map<String, bool> foodChoice;
   final Map<String, bool> serviceAndFacilities;
   final Map<String, bool> medicalNeeds;
@@ -120,27 +139,27 @@ class petShop {
     Map<String, bool>? foodChoice,
     Map<String, bool>? serviceAndFacilities,
     Map<String, bool>? medicalNeeds,
-  })  : this.roomCollection = roomCollection ?? 
+  })  : this.roomCollection = roomCollection ??
             {
               '獨立房型': false,
               '開放式住宿': false,
               '半開放式住宿': false,
             },
-        this.foodChoice = foodChoice ?? 
+        this.foodChoice = foodChoice ??
             {
               '鮮食': false,
               '罐頭': false,
               '乾飼料': false,
               '處方飼料': false,
             },
-        this.serviceAndFacilities = serviceAndFacilities ?? 
+        this.serviceAndFacilities = serviceAndFacilities ??
             {
               '24小時監控': false,
               '24小時寵物保姆': false,
               '開放式活動空間': false,
               '游泳池': false,
             },
-        this.medicalNeeds = medicalNeeds ?? 
+        this.medicalNeeds = medicalNeeds ??
             {
               '口服藥': false,
               '外傷藥': false,
@@ -149,7 +168,7 @@ class petShop {
 
   factory petShop.fromJson(Map<String, dynamic> json) {
     final Map<String, bool> roomCollectionData =
-        Map<String, bool>.from(json['roomCollection'] ?? 
+        Map<String, bool>.from(json['roomCollection'] ??
             {
               '獨立房型': false,
               '開放式住宿': false,
@@ -157,7 +176,7 @@ class petShop {
             });
 
     final Map<String, bool> foodChoiceData =
-        Map<String, bool>.from(json['foodChoice'] ?? 
+        Map<String, bool>.from(json['foodChoice'] ??
             {
               '鮮食': false,
               '罐頭': false,
@@ -166,7 +185,7 @@ class petShop {
             });
 
     final Map<String, bool> serviceAndFacilitiesData =
-        Map<String, bool>.from(json['serviceAndFacilities'] ?? 
+        Map<String, bool>.from(json['serviceAndFacilities'] ??
             {
               '24小時監控': false,
               '24小時寵物保姆': false,
@@ -175,13 +194,13 @@ class petShop {
             });
 
     final Map<String, bool> medicalNeedsData =
-        Map<String, bool>.from(json['medicalNeeds'] ?? 
+        Map<String, bool>.from(json['medicalNeeds'] ??
             {
               '口服藥': false,
               '外傷藥': false,
               '陪伴看診': false,
             });
-    
+
     return petShop(
       id: json['ID'],
       legalType: json['legaltype'],
@@ -210,7 +229,6 @@ class petShop {
       serviceAndFacilities: serviceAndFacilitiesData,
       medicalNeeds: medicalNeedsData,
     );
-    
   }
 
   Map<String, dynamic> toMap() {

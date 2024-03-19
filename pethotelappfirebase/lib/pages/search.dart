@@ -12,15 +12,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 class SearchPage extends ConsumerWidget {
   SearchPage({Key? key}) : super(key: key);
 
-  // static bool _shopsFetched = false; // 使用静态变量来全局跟踪是否已获取数据
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = ref.watch(shopsProvider.notifier);
-    // 只在数据未加载时调用fetchShops
-
+    //只在数据未加载时调用fetchShops
     notifier.fetchShops(); // 获取商店数据
-
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -40,7 +38,7 @@ class SearchPage extends ConsumerWidget {
               FirebaseAuth.instance.signOut(); // 將FirebaseAuth的狀態登出
             },
             child: const Text(
-              'Sign out',
+              '登出',
               style: TextStyle(color: Colors.white),
             ),
           ),
@@ -196,8 +194,25 @@ class SearchPage extends ConsumerWidget {
                     child: CustomButton(
                       iconAsset: 'assets/pets.svg',
                       label: '寵物繁殖買賣',
-                      onPressed: () {
-                        // 在這裡執行按鈕被點擊時的操作
+                      onPressed: () async {
+                        List<petShop> firestoreShops = await notifier
+                            .fetchFirestoreShops(); // 获取最新的 Firestore 数据
+                        List<petShop> filteredShops = firestoreShops
+                            .where((shop) =>
+                                shop.busItem.contains('A') ||
+                                shop.busItem.contains('AC') ||
+                                shop.busItem.contains('B') ||
+                                shop.busItem.contains('BC') ||
+                                shop.busItem.contains('AB') ||
+                                shop.busItem.contains('ABC'))
+                            .toList();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                SortPetHotel(shops: filteredShops),
+                          ),
+                        );
                       },
                     ),
                   ),

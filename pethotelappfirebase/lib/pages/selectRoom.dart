@@ -8,7 +8,7 @@ class SelectRoomPage extends StatefulWidget {
   final DateTime? checkInDate;
   final DateTime? checkOutDate;
   final int numberOfNights;
-  final double totalPrice;
+  final int totalPrice;
 
   SelectRoomPage({
     required this.shop,
@@ -103,7 +103,7 @@ class _SelectRoomPageState extends State<SelectRoomPage> {
                       ),
                     ),
                   Text(
-                    '${widget.numberOfNights <= 0 ? "1晚價錢" : "${widget.numberOfNights.toStringAsFixed(0)}晚總價:TWD "}${widget.totalPrice.toStringAsFixed(0)}',
+                    '${widget.numberOfNights <= 0 ? "1晚價錢" : "${widget.numberOfNights.toStringAsFixed(0)}晚總價:TWD "}${widget.totalPrice}',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.black87,

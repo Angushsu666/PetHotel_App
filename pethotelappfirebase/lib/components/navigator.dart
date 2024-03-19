@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../pages/search.dart';
 import '../pages/more.dart';
 import '../pages/message.dart';
-import '../pages/order.dart';
+import '../pages/orderPage.dart';
 
 import '../providers/navigator_provider.dart';
 import '../providers/user_provider.dart';
@@ -18,10 +18,10 @@ class NavigatorPage extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly, // 水平均匀分布按钮
           children: [
-            NavigationButton(0, 'Search', Icons.search),
-            NavigationButton(1, 'Order', Icons.event_note),
-            NavigationButton(2, 'Message', Icons.message),
-            NavigationButton(3, 'More', Icons.more_vert),
+            NavigationButton(0, '搜尋', Icons.search),
+            NavigationButton(1, '訂單', Icons.event_note),
+            NavigationButton(2, '訊息', Icons.message),
+            NavigationButton(3, '更多', Icons.more_vert),
           ],
         ),
       ),

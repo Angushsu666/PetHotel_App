@@ -7,7 +7,7 @@ class SelectRoomInfoPage extends StatefulWidget {
   final DateTime? checkInDate;
   final DateTime? checkOutDate;
   final int numberOfNights;
-  final double totalPrice;
+  final int totalPrice;
   final String roomType; // 添加这行来接收房型信息
 
   SelectRoomInfoPage({

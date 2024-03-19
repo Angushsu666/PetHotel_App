@@ -64,7 +64,7 @@ class _ShopSignUp extends ConsumerState<ShopSignUp> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "please enter your email";
+                      return "請輸入電子信箱";
                     } else if (!emailValid.hasMatch(value)) {
                       return "請輸入完整電子信箱 ex. example@gmail.com";
                     } //輸入值不是空且不符合 emailValid 正則表達式所定義的電子郵件格式
@@ -129,7 +129,7 @@ class _ShopSignUp extends ConsumerState<ShopSignUp> {
                     }
                   },
                   child: const Text(
-                    'Shop create new account',
+                    '新增商家帳號',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,

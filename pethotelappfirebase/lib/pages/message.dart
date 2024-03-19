@@ -15,7 +15,7 @@ class MessagesListPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Messages'),
+        title: Text('訊息'),
         backgroundColor: Color.fromARGB(255, 226, 160, 182),
       ),
       body: Consumer(

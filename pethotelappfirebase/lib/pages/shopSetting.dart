@@ -62,7 +62,7 @@ class _ShopSettingsState extends ConsumerState<ShopSettings> {
     _nameContorller.text = currentUser.user.name;
     // _priceController.text = shopsNotifier.;
     return Scaffold(
-      appBar: AppBar(title: const Text("Settings ShopPage")),
+      appBar: AppBar(title: const Text("商家設定頁面")),
       backgroundColor: Color.fromARGB(255, 226, 160, 182), // 更改AppBar的背景顏色
       body: SingleChildScrollView(
         child: Padding(
@@ -107,11 +107,11 @@ class _ShopSettingsState extends ConsumerState<ShopSettings> {
                 height: 10,
               ),
               Center(
-                child: Text("Tap image to Change"),
+                child: Text("更換照片"),
               ),
               //Update Name
               TextFormField(
-                decoration: const InputDecoration(labelText: "Enter your Name"),
+                decoration: const InputDecoration(labelText: "輸入名字"),
                 controller: _nameContorller,
               ),
               TextButton(
@@ -120,10 +120,10 @@ class _ShopSettingsState extends ConsumerState<ShopSettings> {
                         .read(userProvider.notifier)
                         .updateName(_nameContorller.text);
                   },
-                  child: const Text('Update Name')),
+                  child: const Text('上傳名字')),
               // Update Price
               TextFormField(
-                decoration: const InputDecoration(labelText: "Enter your Price"),
+                decoration: const InputDecoration(labelText: "輸入價錢"),
                 controller: _priceContorller, // 使用价格控制器
                 keyboardType: TextInputType.number, // 仅允许输入数字
               ),
@@ -138,7 +138,7 @@ class _ShopSettingsState extends ConsumerState<ShopSettings> {
                     print('Error updating price: $e');
                   }
                 },
-                child: const Text('Update Price'),
+                child: const Text('更新服務價錢'),
               ),
               // Update roomCollection
               ...roomCollection.entries.map((entry) {
@@ -158,7 +158,7 @@ class _ShopSettingsState extends ConsumerState<ShopSettings> {
                 onPressed: () async {
                   await shopsNotifier.changeRoom(roomCollection, currentUser);
                 },
-                child: const Text('Update Room Collection'),
+                child: const Text('更新房型選擇服務'),
               ),
               // 将 Map 转换为 List 并展开
               // Update foodChoice
@@ -179,7 +179,7 @@ class _ShopSettingsState extends ConsumerState<ShopSettings> {
                 onPressed: () async {
                   await shopsNotifier.changeFoodChoice(foodChoice, currentUser);
                 },
-                child: const Text('Update Food Choice'),
+                child: const Text('更新食物選擇服務'),
               ),
               // Update serviceAndFacilities
               ...serviceAndFacilities.entries.map((entry) {
@@ -200,7 +200,7 @@ class _ShopSettingsState extends ConsumerState<ShopSettings> {
                   await shopsNotifier.changeServiceAndFacilities(
                       serviceAndFacilities, currentUser);
                 },
-                child: const Text('Update Service and Facilities'),
+                child: const Text('更新服務與設施'),
               ),
               // Update medicalNeeds
               ...medicalNeeds.entries.map((entry) {
@@ -221,7 +221,7 @@ class _ShopSettingsState extends ConsumerState<ShopSettings> {
                   await shopsNotifier.changeMedicalNeeds(
                       medicalNeeds, currentUser);
                 },
-                child: const Text('Update Medical Needs'),
+                child: const Text('更新醫療需求服務'),
               ),
             ],
           ),

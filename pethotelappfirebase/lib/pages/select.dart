@@ -7,7 +7,6 @@ import 'messageBox.dart'; // 注意这里导入 MessagePage 的路径
 import '../providers/user_provider.dart'; // 引入 userProvider
 import '../providers/shop_provider.dart';
 
-// 转换为 ConsumerStatefulWidget
 class SelectPage extends ConsumerStatefulWidget {
   final petShop shop; // 接收商店物件
 
@@ -22,10 +21,12 @@ class _SelectPageState extends ConsumerState<SelectPage> {
   DateTime? checkInDate;
   DateTime? checkOutDate;
   int numberOfNights = 0;
-  double totalPrice = 0.0;
+  int totalPrice = 0;
 
   final _formKey = GlobalKey<FormState>();
   final _commentController = TextEditingController();
+  Map<String, TextEditingController> _replyControllers = {};
+
   double _currentRating = 0;
 
   //選擇日期
@@ -55,20 +56,30 @@ class _SelectPageState extends ConsumerState<SelectPage> {
 
   @override
   void dispose() {
+    // 遍历 _replyControllers 映射，并对每个控制器调用 dispose 方法
+    for (var controller in _replyControllers.values) {
+      controller.dispose();
+    }
+
+    // 如果有其他需要手动释放的资源，也在这里处理
     _commentController.dispose();
+
+    // 调用 super.dispose() 来完成 dispose 流程
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     LocalUser currentUser = ref.watch(userProvider);
+    double averageRating = calculateAverageRating(widget.shop.reviews);
+    String starsDisplay = generateStars(averageRating);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
           widget.shop.legalName, // 顯示商家名稱
           style: TextStyle(
-            color: Colors.white,
+            color: Colors.black54,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -130,7 +141,7 @@ class _SelectPageState extends ConsumerState<SelectPage> {
                   (index) => Container(
                     width: 200, // 調整照片的寬度
                     margin: EdgeInsets.all(8),
-                    color: Colors.grey, // 假設使用灰色作為照片區塊的底色
+                    color: Colors.black12, // 假設使用灰色作為照片區塊的底色
                     // 這裡可以放入照片，例如 Image.asset 或 Image.network
                   ),
                 ),
@@ -145,90 +156,100 @@ class _SelectPageState extends ConsumerState<SelectPage> {
                   Text(
                     widget.shop.legalName,
                     style: TextStyle(
-                      fontSize: 20,
+                      color: Colors.black54,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Icon(Icons.star, color: Colors.yellow),
-                    ],
+                  Text(
+                    '評分: ${averageRating.toStringAsFixed(1)} $starsDisplay',
+                    style: TextStyle(
+                      color: Colors.black54,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
             ),
-            //選擇要服務的日期以及服務價錢
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextButton(
-                  onPressed: () async {
-                    final selectedDates = await _selectDates();
-                    if (selectedDates != null) {
-                      setState(() {
-                        checkInDate = selectedDates[0];
-                        checkOutDate = selectedDates[1];
-                        final nights =
-                            checkOutDate!.difference(checkInDate!).inDays;
-                        numberOfNights = nights;
-                        //不同房型，價錢要先設定好
-                        // totalPrice = widget.shop.price * nights.toDouble();
-                        totalPrice = 500 * nights.toDouble();
-                      });
-                    }
-                  },
-                  child: checkInDate == null || checkOutDate == null
-                      ? Text('選擇日期')
-                      : RichText(
-                          text: TextSpan(
-                            style: DefaultTextStyle.of(context).style.copyWith(
-                                  decoration: TextDecoration.none, // 移除底线
-                                  fontSize: 16.0,
+            //選擇要的日期以及服務價錢
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextButton(
+                    onPressed: () async {
+                      final selectedDates = await _selectDates();
+                      if (selectedDates != null) {
+                        setState(() {
+                          checkInDate = selectedDates[0];
+                          checkOutDate = selectedDates[1];
+                          final nights =
+                              checkOutDate!.difference(checkInDate!).inDays;
+                          numberOfNights = nights;
+                          //不同房型，價錢要先設定好
+                          // totalPrice = widget.shop.price * nights.toDouble();
+                          totalPrice = 500 * nights;
+                        });
+                      }
+                    },
+                    child: checkInDate == null || checkOutDate == null
+                        ? Text('選擇日期')
+                        : RichText(
+                            text: TextSpan(
+                              style:
+                                  DefaultTextStyle.of(context).style.copyWith(
+                                        decoration: TextDecoration.none, // 移除底线
+                                        fontSize: 16.0,
+                                      ),
+                              children: <TextSpan>[
+                                TextSpan(
+                                  text: '入住時間: ',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Color.fromARGB(255, 227, 225, 225),
+                                  ),
                                 ),
-                            children: <TextSpan>[
-                              TextSpan(
-                                text: '入住時間: ',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color.fromARGB(255, 227, 225, 225),
+                                TextSpan(
+                                  text: DateFormat('MM月dd日 EEEE', 'zh_CN').format(
+                                      checkInDate!), // 格式化为星期 月份日，使用中文（'zh_CN'）
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color.fromARGB(
+                                        255, 110, 172, 223),
+                                  ),
                                 ),
-                              ),
-                              TextSpan(
-                                text: DateFormat('MM月dd日 EEEE', 'zh_CN').format(
-                                    checkInDate!), // 格式化为星期 月份日，使用中文（'zh_CN'）
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.blue,
+                                TextSpan(
+                                  text: '  退房時間: ',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Color.fromARGB(255, 227, 225, 225),
+                                  ),
                                 ),
-                              ),
-                              TextSpan(
-                                text: '  退房時間: ',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color.fromARGB(255, 227, 225, 225),
+                                TextSpan(
+                                  text: DateFormat('MM月dd日 EEEE', 'zh_CN').format(
+                                      checkOutDate!), // 格式化为星期 月份日，使用中文（'zh_CN'）
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color.fromARGB(
+                                        255, 110, 172, 223),
+                                  ),
                                 ),
-                              ),
-                              TextSpan(
-                                text: DateFormat('MM月dd日 EEEE', 'zh_CN').format(
-                                    checkOutDate!), // 格式化为星期 月份日，使用中文（'zh_CN'）
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.blue,
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                ),
-                Text(
-                  '${numberOfNights <= 0 ? "1晚價錢" : "${numberOfNights.toStringAsFixed(0)}晚總價:"}\$${totalPrice.toStringAsFixed(2)}',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.black87,
                   ),
-                ),
-              ],
+                  Text(
+                    '${numberOfNights <= 0 ? "一晚價錢" : "${numberOfNights.toStringAsFixed(0)}晚總價:"}\$${totalPrice.toStringAsFixed(2)}',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
             ),
 
             SizedBox(
@@ -263,7 +284,7 @@ class _SelectPageState extends ConsumerState<SelectPage> {
         ),
       ),
       bottomNavigationBar: Container(
-        color: Colors.grey, // 背景颜色
+        color: const Color.fromARGB(255, 202, 156, 156), // 背景颜色
         child: Padding(
           padding: const EdgeInsets.all(14.0),
           child: ElevatedButton(
@@ -303,7 +324,7 @@ class _SelectPageState extends ConsumerState<SelectPage> {
       style: ElevatedButton.styleFrom(
         backgroundColor: isSelected
             ? Color.fromARGB(255, 226, 160, 182)
-            : Colors.grey, // 设置按钮的背景颜色
+            : Colors.black12, // 设置按钮的背景颜色
       ),
       child: Text(title),
     );
@@ -330,8 +351,30 @@ class _SelectPageState extends ConsumerState<SelectPage> {
   }
 
   Widget buildReviewContent(List<Review> reviews) {
+    print("评论数量: ${reviews.length}");
+    reviews.forEach((review) {
+      print(
+          "作者: ${review.author}, 内容: ${review.content}, 评分: ${review.rating}");
+    });
+    // 遍历评论列表，并打印 shopResponse 数据
+    for (var review in reviews) {
+      print("Review by ${review.author}: ${review.content}");
+      if (review.shopResponse != null) {
+        print(
+            "Shop Response: ${review.shopResponse!.content} at ${review.shopResponse!.responseTimestamp}");
+      } else {
+        print("No shop response.");
+      }
+    }
+
+    final currentUser = ref.watch(userProvider);
+    //商家才可以回覆判斷
+    final canReply = currentUser.user.isShopOwner &&
+        currentUser.user.name == widget.shop.uid;
+
     return Column(
       children: [
+        // 评论提交区域
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -370,13 +413,127 @@ class _SelectPageState extends ConsumerState<SelectPage> {
             ],
           ),
         ),
-        ...reviews
-            .map((review) => ListTile(
-                  title: Text(review.author),
-                  subtitle: Text(review.content),
-                  trailing: Text('${review.rating} 星'),
-                ))
-            .toList(),
+        ...reviews.map((review) {
+          // 为每条评论创建一个新的TextEditingController，并存储到映射中
+          String reviewKey = review.reviewTimestamp.toIso8601String();
+          _replyControllers[reviewKey] = TextEditingController();
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ListTile(
+                title: Text(
+                  '用户名稱：${review.author}',
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                subtitle: Text(
+                  '評價內容：${review.content}',
+                  style: TextStyle(
+                    color: Colors.black45,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                trailing: Column(
+                  mainAxisSize: MainAxisSize.min, // 让Column占用尽可能小的空间
+                  children: [
+                    Text(
+                      '${DateFormat('yyyy-MM-dd').format(review.reviewTimestamp)}',
+                      style: TextStyle(
+                          fontSize: 14, color: Colors.black), // 调整日期文字的样式
+                    ),
+                    Text(
+                      '${review.rating} 星',
+                      style: TextStyle(
+                        color: Colors.black45,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (review.shopResponse != null)
+                Padding(
+                  padding:
+                      const EdgeInsets.only(left: 20, right: 20, bottom: 10),
+                  child: RichText(
+                    text: TextSpan(
+                      children: [
+                        WidgetSpan(
+                          child: Icon(Icons.arrow_right,
+                              size: 30, color: Colors.black), // 添加向右的箭头图标
+                          alignment: PlaceholderAlignment.middle, // 调整图标的垂直对齐
+                        ),
+                        WidgetSpan(
+                          child: SizedBox(width: 4), // 在图标和文本之间添加一些间隔
+                        ),
+                        TextSpan(
+                          text: '${widget.shop.legalName}: ',
+                          style: TextStyle(
+                            color: Colors.black45,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        WidgetSpan(
+                          child: SizedBox(width: 2), // 在商家名称和回复内容之间添加一些间隔
+                        ),
+                        TextSpan(
+                          text: '${review.shopResponse!.content} ',
+                          style: TextStyle(fontSize: 16, color: Colors.black),
+                        ),
+                        WidgetSpan(
+                          child: SizedBox(width: 8), // 在回复内容和日期之间添加更多间隔
+                        ),
+                        TextSpan(
+                          text:
+                              '(${DateFormat('yyyy-MM-dd').format(review.shopResponse!.responseTimestamp)})',
+                          style: TextStyle(fontSize: 16, color: Colors.black),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              // 只有当允许回复且评论没有商家回复时才显示回复输入框
+              if (canReply && review.shopResponse == null)
+                Padding(
+                  padding:
+                      const EdgeInsets.only(left: 20, right: 20, bottom: 10),
+                  child: TextField(
+                    controller: _replyControllers[reviewKey], // 使用对应的控制器
+                    decoration: InputDecoration(
+                      hintText: '回覆此評論',
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.send),
+                        onPressed: () {
+                          // 获取当前评论对应的控制器中的文本
+                          String replyText = _replyControllers[reviewKey]!.text;
+                          if (replyText.isNotEmpty) {
+                            // 调用添加商家回复的方法
+                            ref.read(shopsProvider.notifier).addShopResponse(
+                                currentUser, reviewKey, replyText);
+
+                            // 清空当前评论的回复输入框
+                            _replyControllers[reviewKey]!.clear();
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              Divider(
+                color: Colors.grey,
+                thickness: 1,
+                height: 20,
+              ),
+            ],
+          );
+        }).toList(),
       ],
     );
   }
@@ -398,4 +555,24 @@ class _SelectPageState extends ConsumerState<SelectPage> {
       _currentRating = 0;
     });
   }
+}
+
+double calculateAverageRating(List<Review> reviews) {
+  if (reviews.isEmpty) {
+    return 0.0;
+  }
+  double sum = reviews.fold(
+      0.0, (previousValue, review) => previousValue + review.rating);
+  return sum / reviews.length;
+}
+
+String generateStars(double averageRating) {
+  int fullStars = averageRating.floor();
+  double remaining = averageRating - fullStars;
+  String stars = '★' * fullStars;
+  if (remaining >= 0.5) {
+    stars += '⭐'; // 半星用 ⭐ 表示
+  }
+  stars += '☆' * (5 - stars.length);
+  return stars;
 }

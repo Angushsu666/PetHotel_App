@@ -46,9 +46,10 @@ dependencies:
   path: ^1.8.3
   flutter_svg: ^2.0.7
   intl: ^0.18.1
-  webview_flutter: ^4.4.1
+  webview_flutter: ^4.7.0
   rxdart: ^0.27.7
-  
+  url_launcher: ^6.2.4
+  uni_links: ^0.5.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -38,7 +38,7 @@ class _SelectPageState extends ConsumerState<SelectPage> {
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: Color.fromARGB(255, 235, 185, 201), // 日期选择器的主要颜色
+            primaryColor: Color.fromRGBO(255, 239, 239, 1.0), // 日期选择器的主要颜色
             colorScheme:
                 ColorScheme.light(primary: Color.fromARGB(255, 188, 156, 192)),
             buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary),
@@ -92,7 +92,6 @@ class _SelectPageState extends ConsumerState<SelectPage> {
             Navigator.pop(context);
           },
         ),
-        backgroundColor: Color.fromARGB(255, 226, 160, 182), // 更改AppBar的背景顏色
 
         actions: [
           IconButton(
@@ -126,7 +125,6 @@ class _SelectPageState extends ConsumerState<SelectPage> {
           ),
         ],
       ),
-      backgroundColor: Color.fromARGB(255, 226, 160, 182),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,8 +187,8 @@ class _SelectPageState extends ConsumerState<SelectPage> {
                           final nights =
                               checkOutDate!.difference(checkInDate!).inDays;
                           numberOfNights = nights;
-                          //不同房型，價錢要先設定好
-                          // totalPrice = widget.shop.price * nights.toDouble();
+                          // 不同房型，價錢要先設定好!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                          // totalPrice = widget.shop.price * nights ;
                           totalPrice = 500 * nights;
                         });
                       }
@@ -204,12 +202,12 @@ class _SelectPageState extends ConsumerState<SelectPage> {
                                         decoration: TextDecoration.none, // 移除底线
                                         fontSize: 16.0,
                                       ),
-                              children: <TextSpan>[
+                              children: <InlineSpan>[
                                 TextSpan(
                                   text: '入住時間: ',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    color: Color.fromARGB(255, 227, 225, 225),
+                                    color: Colors.black54,
                                   ),
                                 ),
                                 TextSpan(
@@ -217,15 +215,15 @@ class _SelectPageState extends ConsumerState<SelectPage> {
                                       checkInDate!), // 格式化为星期 月份日，使用中文（'zh_CN'）
                                   style: TextStyle(
                                     fontWeight: FontWeight.w600,
-                                    color: const Color.fromARGB(
-                                        255, 110, 172, 223),
+                                    color: Colors.black54,
                                   ),
                                 ),
+                                TextSpan(text: '\n'), // 这里添加换行符
                                 TextSpan(
-                                  text: '  退房時間: ',
+                                  text: '退房時間: ',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    color: Color.fromARGB(255, 227, 225, 225),
+                                    color: Colors.black54,
                                   ),
                                 ),
                                 TextSpan(
@@ -233,8 +231,7 @@ class _SelectPageState extends ConsumerState<SelectPage> {
                                       checkOutDate!), // 格式化为星期 月份日，使用中文（'zh_CN'）
                                   style: TextStyle(
                                     fontWeight: FontWeight.w600,
-                                    color: const Color.fromARGB(
-                                        255, 110, 172, 223),
+                                    color: Colors.black54,
                                   ),
                                 ),
                               ],
@@ -242,7 +239,7 @@ class _SelectPageState extends ConsumerState<SelectPage> {
                           ),
                   ),
                   Text(
-                    '${numberOfNights <= 0 ? "一晚價錢" : "${numberOfNights.toStringAsFixed(0)}晚總價:"}\$${totalPrice.toStringAsFixed(2)}',
+                    '${numberOfNights <= 0 ? "一晚價錢" : "${numberOfNights}晚總價:"}\$${totalPrice}',
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.black87,
@@ -284,7 +281,6 @@ class _SelectPageState extends ConsumerState<SelectPage> {
         ),
       ),
       bottomNavigationBar: Container(
-        color: const Color.fromARGB(255, 202, 156, 156), // 背景颜色
         child: Padding(
           padding: const EdgeInsets.all(14.0),
           child: ElevatedButton(
@@ -304,7 +300,7 @@ class _SelectPageState extends ConsumerState<SelectPage> {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color.fromARGB(255, 226, 160, 182), // 按钮背景颜色
+              backgroundColor: Color.fromRGBO(255, 239, 239, 1.0), // 按钮背景颜色
             ),
             child: Text('預定房型'),
           ),
@@ -323,10 +319,15 @@ class _SelectPageState extends ConsumerState<SelectPage> {
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: isSelected
-            ? Color.fromARGB(255, 226, 160, 182)
+            ? Color.fromRGBO(255, 239, 239, 1.0)
             : Colors.black12, // 设置按钮的背景颜色
       ),
-      child: Text(title),
+      child: Text(
+        title,
+        style: TextStyle(
+          color: Colors.black,
+        ),
+      ),
     );
   }
 
@@ -423,7 +424,7 @@ class _SelectPageState extends ConsumerState<SelectPage> {
             children: [
               ListTile(
                 title: Text(
-                  '用户名稱：${review.author}',
+                  '用戶名稱：${review.author}',
                   style: TextStyle(
                     color: Colors.black54,
                     fontSize: 16,

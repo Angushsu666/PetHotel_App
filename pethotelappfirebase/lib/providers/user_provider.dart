@@ -34,7 +34,7 @@ class UserNotifier extends StateNotifier<LocalUser> {
           const LocalUser(
             id: "error",
             user: FirebaseUser(
-              email: "error", name: "error", profilePic: "error",
+              phone: "error", name: "error", profilePic: "error",
               isShopOwner: false, // 預設為 false
               shops: [], // 添加这个属性
             ),
@@ -46,17 +46,17 @@ class UserNotifier extends StateNotifier<LocalUser> {
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
   //登入
-  Future<void> login(String email) async {
+  Future<void> login(String phone) async {
     QuerySnapshot response = await _firestore
         .collection("users")
-        .where('email', isEqualTo: email)
+        .where('phone', isEqualTo: phone)
         .get();
     if (response.docs.isEmpty) {
-      print("No firestore user assiciated to authenticated email $email");
+      print("No firestore user assiciated to authenticated phone $phone");
       return;
     }
     if (response.docs.length != 1) {
-      print("More than one firestore user associate with email: $email");
+      print("More than one firestore user associate with phone: $phone");
       return;
     }
     //？？？？？？？
@@ -67,10 +67,29 @@ class UserNotifier extends StateNotifier<LocalUser> {
   }
 
   // 一般用戶註冊
-  Future<void> signUp(String email) async {
+  Future<void> signUp(String phone, String name) async {
     DocumentReference response = await _firestore.collection("users").add(
           FirebaseUser(
-            email: email,
+            phone: phone,
+            name: name, // 使用传入的name参数
+            profilePic: "https://i.imgur.com/ZX0PtRb.png",
+            isShopOwner: false,
+            shops: [],
+          ).toMap(),
+        );
+
+    DocumentSnapshot snapshot = await response.get();
+    state = LocalUser(
+      id: response.id,
+      user: FirebaseUser.fromMap(snapshot.data() as Map<String, dynamic>),
+    );
+  }
+
+  // 一般用戶註冊
+  Future<void> signUpwemail(String phone) async {
+    DocumentReference response = await _firestore.collection("users").add(
+          FirebaseUser(
+            phone: phone,
             name: "No Name",
             profilePic: "https://i.imgur.com/ZX0PtRb.png",
             isShopOwner: false, // 設定為 false
@@ -86,16 +105,16 @@ class UserNotifier extends StateNotifier<LocalUser> {
   }
 
   // 店家註冊
-  Future<void> shopSignUp(String email) async {
+  Future<void> shopSignUp(String phone, String name) async {
     DocumentReference response = await _firestore.collection("users").add(
           FirebaseUser(
-            email: email,
-            name: "No Name",
+            phone: phone,
+            name: name, // 使用传入的name参数
             profilePic: "https://i.imgur.com/ZX0PtRb.png",
             isShopOwner: true, // 設定為 true
             shops: [],
           ).toMap(),
-        );//將users資料加進Cloud Firestore
+        ); //將users資料加進Cloud Firestore
 
     DocumentSnapshot snapshot = await response.get();
     state = LocalUser(
@@ -108,6 +127,7 @@ class UserNotifier extends StateNotifier<LocalUser> {
     await _firestore.collection("users").doc(state.id).update({'name': name});
     state = state.copyWith(user: state.user.copyWith(name: name));
   }
+
   //updateImage
   Future<void> updateImage(File image) async {
     //we want a folder in our storage
@@ -129,7 +149,7 @@ class UserNotifier extends StateNotifier<LocalUser> {
     state = const LocalUser(
       id: "error",
       user: FirebaseUser(
-        email: "error",
+        phone: "error",
         name: "error",
         profilePic: "error",
         isShopOwner: false, // 設定為 false //?????但這樣登出後店家登入會不會被當作一般的使用者

@@ -34,7 +34,6 @@ class _SelectRoomPageState extends State<SelectRoomPage> {
             Text(
               '選擇客房', // 主标题
               style: TextStyle(
-                color: Colors.white,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -43,7 +42,6 @@ class _SelectRoomPageState extends State<SelectRoomPage> {
               widget.shop.legalName, // 商家名称
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.white,
               ),
             ),
           ],
@@ -56,7 +54,6 @@ class _SelectRoomPageState extends State<SelectRoomPage> {
             Navigator.pop(context);
           },
         ),
-        backgroundColor: Color.fromARGB(255, 77, 73, 74),
         actions: [
           IconButton(
             icon: Icon(Icons.share),
@@ -66,7 +63,6 @@ class _SelectRoomPageState extends State<SelectRoomPage> {
           ),
         ],
       ),
-      backgroundColor: Color.fromARGB(255, 228, 228, 228),
       body: ListView.builder(
         itemCount: widget.shop.roomCollection.length,
         itemBuilder: (context, index) {
@@ -76,7 +72,7 @@ class _SelectRoomPageState extends State<SelectRoomPage> {
           return Container(
             margin: EdgeInsets.all(16.0), // 设置外边距为16像素
             decoration: BoxDecoration(
-              color: Colors.grey, // 灰色背景
+              color: const Color.fromARGB(255, 204, 204, 204), // 灰色背景
               borderRadius: BorderRadius.circular(8.0), // 圆角边框
             ),
             child: ListTile(
@@ -128,7 +124,8 @@ class _SelectRoomPageState extends State<SelectRoomPage> {
                       },
                       style: ElevatedButton.styleFrom(
                         side: BorderSide(
-                            color: Colors.blue, width: 2.0), // Blue border
+                            color: Color.fromRGBO(255, 239, 239, 1.0),
+                            width: 2.0), // Blue border
                         backgroundColor:
                             Colors.transparent, // No background color
                       ),

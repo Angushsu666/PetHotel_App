@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "41462146256",
+    "firebase_url": "https://pethotelappfirebase-default-rtdb.firebaseio.com",
     "project_id": "pethotelappfirebase",
     "storage_bucket": "pethotelappfirebase.appspot.com"
   },
@@ -29,6 +30,13 @@
             {
               "client_id": "41462146256-slgr0ofvgaj46q19u0djtif1kvmigkbe.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "41462146256-ubd931qp62frhmg6p82qfu272jc6qsl6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.pethotelappfirebase"
+              }
             }
           ]
         }

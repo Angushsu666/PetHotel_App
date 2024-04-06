@@ -6,14 +6,14 @@ import 'package:flutter/foundation.dart';
 import 'petshop.dart';
 
 class FirebaseUser {
-  final String email;
+  final String phone;
   final String name;
   final String profilePic;
   final bool isShopOwner; // 新增bool字段
   final List<petShop> shops; // user擁有的店家
 
   const FirebaseUser({
-    required this.email,
+    required this.phone,
     required this.name,
     required this.profilePic,
     required this.isShopOwner,
@@ -22,7 +22,7 @@ class FirebaseUser {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'email': email,
+      'phone': phone,
       'name': name,
       'profilePic': profilePic,
       'isShopOwner': isShopOwner,
@@ -31,14 +31,14 @@ class FirebaseUser {
   }
 
   FirebaseUser copyWith({
-    String? email,
+    String? phone,
     String? name,
     String? profilePic,
     bool? isShopOwner,
     List<petShop>? shops,
   }) {
     return FirebaseUser(
-      email: email ?? this.email,
+      phone: phone ?? this.phone,
       name: name ?? this.name,
       profilePic: profilePic ?? this.profilePic,
       isShopOwner: isShopOwner ?? this.isShopOwner,
@@ -48,7 +48,7 @@ class FirebaseUser {
 
   factory FirebaseUser.fromMap(Map<String, dynamic> map) {
     return FirebaseUser(
-      email: map['email'] as String,
+      phone: map['phone'] as String,
       name: map['name'] as String,
       profilePic: map['profilePic'] as String,
       isShopOwner: map['isShopOwner'] as bool,
@@ -67,14 +67,14 @@ class FirebaseUser {
 
   @override
   String toString() {
-    return 'FirebaseUser(email: $email, name: $name, profilePic: $profilePic, isShopOwner: $isShopOwner, shops: $shops)';
+    return 'FirebaseUser(phone: $phone, name: $name, profilePic: $profilePic, isShopOwner: $isShopOwner, shops: $shops)';
   }
 
   @override
   bool operator ==(covariant FirebaseUser other) {
     if (identical(this, other)) return true;
 
-    return other.email == email &&
+    return other.phone == phone &&
         other.name == name &&
         other.profilePic == profilePic &&
         other.isShopOwner == isShopOwner &&
@@ -83,7 +83,7 @@ class FirebaseUser {
 
   @override
   int get hashCode {
-    return email.hashCode ^
+    return phone.hashCode ^
         name.hashCode ^
         profilePic.hashCode ^
         isShopOwner.hashCode ^

@@ -12,7 +12,7 @@ class NavigatorPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Color.fromARGB(255, 185, 182, 182), // 设置底部导航栏的背景颜色
+      color: Color.fromARGB(255, 230, 228, 228), // 设置底部导航栏的背景颜色
       child: Padding(
         padding: const EdgeInsets.all(14.0),
         child: Row(
@@ -94,7 +94,7 @@ class NavigationButton extends ConsumerWidget {
       child: Container(
         width: buttonWidth,
         height: 50,
-        color: Colors.transparent, // 设置按钮的背景颜色为透明
+        color: const Color.fromARGB(0, 238, 234, 234), // 设置按钮的背景颜色为透明
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

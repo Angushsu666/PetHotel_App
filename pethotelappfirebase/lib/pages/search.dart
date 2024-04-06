@@ -1,31 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart'; // 引入flutter_svg
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pethotelappfirebase/pages/home.dart';
+import '../pages/signin.dart';
 import '../components/navigator.dart';
-// import '../components/shoplist.dart';
 import '../models/petshop.dart';
 import '../providers/shop_provider.dart';
-import 'sortPetHotel.dart';
+import 'searchSortPetHotel.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class SearchPage extends ConsumerWidget {
   SearchPage({Key? key}) : super(key: key);
-
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = ref.watch(shopsProvider.notifier);
     //只在数据未加载时调用fetchShops
     notifier.fetchShops(); // 获取商店数据
-    
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Home 選擇你要的服務',
-          style: TextStyle(color: Color.fromARGB(255, 226, 160, 182)),
-        ),
-        backgroundColor: Color.fromARGB(255, 226, 160, 182),
+      
+        backgroundColor:  Color.fromRGBO(255, 239, 239, 1.0),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -34,17 +29,24 @@ class SearchPage extends ConsumerWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              FirebaseAuth.instance.signOut(); // 將FirebaseAuth的狀態登出
+            onPressed: () async {
+              try {
+                print("正在尝试登出");
+                await FirebaseAuth.instance.signOut();
+                print("登出成功");
+                Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (_) => SignIn()));
+              } catch (e) {
+                print("登出失败: $e");
+              }
             },
             child: const Text(
               '登出',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.black),
             ),
           ),
         ],
       ),
-      backgroundColor: Color.fromARGB(255, 226, 160, 182),
       body: Column(
         children: [
           //測試商店列表
@@ -276,7 +278,7 @@ class CustomButton extends StatelessWidget {
       style: ButtonStyle(
         fixedSize: MaterialStateProperty.all(Size(buttonWidth, 80)), // 設定寬度和高度
         backgroundColor: MaterialStateProperty.all(
-            const Color.fromARGB(255, 226, 160, 182)), // 設定背景顏色
+            const  Color.fromRGBO(255, 239, 239, 0.5),), // 設定背景顏色
         foregroundColor: MaterialStateProperty.all(Colors.white), // 設定文字顏色
       ),
       child: Row(

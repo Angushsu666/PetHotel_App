@@ -1,0 +1,50 @@
+// import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:intl/intl.dart';
+// import '../models/Message.dart';
+// import '../providers/message_provider.dart';
+// import '../providers/user_provider.dart';
+
+// class ShopMessagesPage extends ConsumerWidget {
+//   final String shopName;
+
+//   ShopMessagesPage({required this.shopName});
+
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     LocalUser currentUser = ref.watch(userProvider);
+//     shopName= currentUser.user.name;
+//     final messagesStream = ref.watch(messageProvider).getShopMessages(shopName);
+
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('$shopName 的消息'),
+//         backgroundColor: Color.fromARGB(255, 226, 160, 182),
+//       ),
+//       body: StreamBuilder<List<Message>>(
+//         stream: messagesStream,
+//         builder: (context, snapshot) {
+//           if (snapshot.connectionState == ConnectionState.waiting) {
+//             return Center(child: CircularProgressIndicator());
+//           }
+
+//           if (!snapshot.hasData || snapshot.data!.isEmpty) {
+//             return Center(child: Text("没有消息"));
+//           }
+
+//           return ListView.builder(
+//             itemCount: snapshot.data!.length,
+//             itemBuilder: (context, index) {
+//               Message message = snapshot.data![index];
+//               return ListTile(
+//                 title: Text(message.messageContent),
+//                 subtitle: Text('来自: ${message.senderName}'),
+//                 trailing: Text(DateFormat('yyyy-MM-dd – kk:mm').format(message.timestamp)),
+//               );
+//             },
+//           );
+//         },
+//       ),
+//     );
+//   }
+// }

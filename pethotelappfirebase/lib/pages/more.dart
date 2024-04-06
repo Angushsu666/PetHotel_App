@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../components/navigator.dart';
 import '../providers/user_provider.dart';
 
-import 'setting.dart';
-import 'shopSetting.dart';
+import 'moreSetting.dart';
+import 'moreShopSetting.dart';
 
 class MorePage extends ConsumerWidget {
   const MorePage({Key? key}) : super(key: key);
@@ -22,10 +22,7 @@ class MorePage extends ConsumerWidget {
             Navigator.pop(context);
           },
         ),
-        backgroundColor: Color.fromARGB(255, 226, 160, 182), // 更改AppBar的背景顏色
-      ),
-      backgroundColor:
-          Color.fromARGB(255, 226, 160, 182), // 設定整個 MorePage 的背景顏色
+      ), // 設定整個 MorePage 的背景顏色
       body: Column(
         children: [
           Expanded(
@@ -116,14 +113,14 @@ class MoreButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: Color.fromARGB(255, 226, 160, 182), // 設定為與背景色相同的顏色
+        backgroundColor: Color.fromRGBO(255, 239, 239, 1.0),// 設定為與背景色相同的顏色
         elevation: 1, // 調整陰影的強度
       ),
       child: Align(
         alignment: Alignment.centerLeft,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Text(title),
+          child: Text(title, style: TextStyle(color: const Color.fromARGB(255, 168, 168, 168)),),
         ),
       ),
     );

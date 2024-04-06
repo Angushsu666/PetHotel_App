@@ -7,20 +7,6 @@ class PaymentWebViewPage extends StatelessWidget {
   const PaymentWebViewPage({Key? key, required this.paymentHtmlContent})
       : super(key: key);
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     appBar: AppBar(
-  //       title: Text('支付页面'),
-  //     ),
-  //     body: WebView(
-  //       initialUrl: 'about:blank',
-  //       onWebViewCreated: (WebViewController webViewController) {
-  //         webViewController.loadHtmlString(paymentHtmlContent);
-  //       },
-  //     ),
-  //   );
-  // }
   @override
   Widget build(BuildContext context) {
     final WebViewController controller =
@@ -32,7 +18,11 @@ class PaymentWebViewPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('支付页面'),
+        title: Text('支付成功頁面'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.popUntil(context, ModalRoute.withName('/searchPage')), // 使用 popUntil 返回指定页面
+        ),
       ),
       body: WebViewWidget(controller: controller),
     );

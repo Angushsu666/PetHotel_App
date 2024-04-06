@@ -99,7 +99,7 @@ class SelectRoomPaymentPage extends ConsumerWidget {
             ListTile(
               title: Text('個人资料'),
               subtitle: Text(
-                '姓名: ${currentUser.user.name}\nEmail: ${currentUser.user.email}',
+                '姓名: ${currentUser.user.name}\nPhone: ${currentUser.user.phone}',
                 style: TextStyle(fontSize: 14),
               ),
             ),

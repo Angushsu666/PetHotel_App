@@ -136,7 +136,7 @@ class ShopsNotifier extends StateNotifier<List<petShop>> {
       Map<String, bool> updatedRoomCollection, LocalUser currentUser) async {
     final firestore = FirebaseFirestore.instance;
     CollectionReference petShopsCollection = firestore.collection('petShops');
-
+      //可判斷誰可以更改。
     QuerySnapshot querySnapshot = await petShopsCollection
         .where('uid', isEqualTo: currentUser.user.name)
         .limit(1)

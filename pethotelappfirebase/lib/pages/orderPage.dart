@@ -16,7 +16,7 @@ class OrderPage extends ConsumerWidget {
           icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        backgroundColor: Color.fromARGB(255, 226, 160, 182),
+        backgroundColor: Color.fromRGBO(255, 239, 239, 1.0),
       ),
       body: Column(
         children: [

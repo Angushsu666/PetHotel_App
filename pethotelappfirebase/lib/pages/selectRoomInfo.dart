@@ -43,7 +43,6 @@ class _SelectRoomInfoPageState extends State<SelectRoomInfoPage> {
             Navigator.pop(context);
           },
         ),
-        backgroundColor: Color.fromARGB(255, 77, 73, 74),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,7 +91,7 @@ class _SelectRoomInfoPageState extends State<SelectRoomInfoPage> {
                     '入住日期: ${DateFormat('MM月dd日 EEEE', 'zh_CN').format(widget.checkInDate!)}',
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: Colors.blue,
+          backgroundColor: Color.fromRGBO(255, 239, 239, 1.0),
                     ),
                   ),
                 Container(
@@ -105,7 +104,7 @@ class _SelectRoomInfoPageState extends State<SelectRoomInfoPage> {
                     '退房日期: ${DateFormat('MM月dd日 EEEE', 'zh_CN').format(widget.checkOutDate!)}',
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: Colors.blue,
+          backgroundColor: Color.fromRGBO(255, 239, 239, 1.0),
                     ),
                   ),
               ],
@@ -124,9 +123,8 @@ class _SelectRoomInfoPageState extends State<SelectRoomInfoPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('寵物類型'),
+                Text('寵物類型:'),
                 //從搜尋傳下來
-                Text('處理pettype'),
               ],
             ),
           ),

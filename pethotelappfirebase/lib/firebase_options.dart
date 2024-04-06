@@ -49,6 +49,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '41462146256',
     projectId: 'pethotelappfirebase',
     authDomain: 'pethotelappfirebase.firebaseapp.com',
+    databaseURL: 'https://pethotelappfirebase-default-rtdb.firebaseio.com',
     storageBucket: 'pethotelappfirebase.appspot.com',
     measurementId: 'G-2QMYHR2CZ2',
   );
@@ -58,6 +59,7 @@ class DefaultFirebaseOptions {
     appId: '1:41462146256:android:f9586b01c6b55bce7cead5',
     messagingSenderId: '41462146256',
     projectId: 'pethotelappfirebase',
+    databaseURL: 'https://pethotelappfirebase-default-rtdb.firebaseio.com',
     storageBucket: 'pethotelappfirebase.appspot.com',
   );
 
@@ -66,6 +68,7 @@ class DefaultFirebaseOptions {
     appId: '1:41462146256:ios:7b194e2d6ddd17f37cead5',
     messagingSenderId: '41462146256',
     projectId: 'pethotelappfirebase',
+    databaseURL: 'https://pethotelappfirebase-default-rtdb.firebaseio.com',
     storageBucket: 'pethotelappfirebase.appspot.com',
     iosClientId: '41462146256-ubd931qp62frhmg6p82qfu272jc6qsl6.apps.googleusercontent.com',
     iosBundleId: 'com.example.pethotelappfirebase',
@@ -76,6 +79,7 @@ class DefaultFirebaseOptions {
     appId: '1:41462146256:ios:5ee13d1f63e774037cead5',
     messagingSenderId: '41462146256',
     projectId: 'pethotelappfirebase',
+    databaseURL: 'https://pethotelappfirebase-default-rtdb.firebaseio.com',
     storageBucket: 'pethotelappfirebase.appspot.com',
     iosClientId: '41462146256-vubb5j9mjecv9uakirhrdm5gnm19ftte.apps.googleusercontent.com',
     iosBundleId: 'com.example.pethotelappfirebase.RunnerTests',

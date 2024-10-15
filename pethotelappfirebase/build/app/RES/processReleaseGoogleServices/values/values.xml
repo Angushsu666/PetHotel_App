@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="default_web_client_id" translatable="false">41462146256-slgr0ofvgaj46q19u0djtif1kvmigkbe.apps.googleusercontent.com</string>
+    <string name="firebase_database_url" translatable="false">https://pethotelappfirebase-default-rtdb.firebaseio.com</string>
+    <string name="gcm_defaultSenderId" translatable="false">41462146256</string>
+    <string name="google_api_key" translatable="false">AIzaSyDQJDdofFKEXXqj7HyAqIIjTbue10DObjk</string>
+    <string name="google_app_id" translatable="false">1:41462146256:android:1ad6342a75451ef67cead5</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyDQJDdofFKEXXqj7HyAqIIjTbue10DObjk</string>
+    <string name="google_storage_bucket" translatable="false">pethotelappfirebase.appspot.com</string>
+    <string name="project_id" translatable="false">pethotelappfirebase</string>
+</resources>

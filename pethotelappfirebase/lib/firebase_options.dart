@@ -71,7 +71,7 @@ class DefaultFirebaseOptions {
     databaseURL: 'https://pethotelappfirebase-default-rtdb.firebaseio.com',
     storageBucket: 'pethotelappfirebase.appspot.com',
     iosClientId: '41462146256-ubd931qp62frhmg6p82qfu272jc6qsl6.apps.googleusercontent.com',
-    iosBundleId: 'com.example.pethotelappfirebase',
+    iosBundleId: 'com.unclecurly320.petserviceapp',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -82,6 +82,6 @@ class DefaultFirebaseOptions {
     databaseURL: 'https://pethotelappfirebase-default-rtdb.firebaseio.com',
     storageBucket: 'pethotelappfirebase.appspot.com',
     iosClientId: '41462146256-vubb5j9mjecv9uakirhrdm5gnm19ftte.apps.googleusercontent.com',
-    iosBundleId: 'com.example.pethotelappfirebase.RunnerTests',
+    iosBundleId: 'com.unclecurly320.petserviceapp.RunnerTests',
   );
 }

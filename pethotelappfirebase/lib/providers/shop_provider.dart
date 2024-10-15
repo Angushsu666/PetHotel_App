@@ -1,7 +1,5 @@
 import 'dart:io'; // Make sure to include this import
-import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 import '../providers/user_provider.dart';
@@ -28,61 +26,128 @@ class ShopsNotifier extends StateNotifier<List<petShop>> {
   ShopsNotifier() : super(([]));
   final DateFormat format = DateFormat("yyyy/M/d a hh:mm:ss"); // 根据实际格式调整
 
-  bool _shopsFetched = false;
-  Future<void> fetchShops() async {
-    if (_shopsFetched) return; // 如果已经获取了数据，就不再执行
-    _shopsFetched = true; // 标记为已获取数据
+  final FirebaseStorage storage = FirebaseStorage.instance;
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-    final response = await http.get(Uri.parse(
-        'https://data.moa.gov.tw/Service/OpenData/TransService.aspx?UnitId=fNT9RMo8PQRO&\$top=1000&\$skip=0&legalname=%e6%9d%b1%e6%a3%ae'));
+  final bool _shopsFetched = false;
 
-    if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
-      // 解析并排序（根据ID降序排列）
-      final List<petShop> shops =
-          jsonData.map((item) => petShop.fromJson(item)).toList();
-      shops.sort((a, b) => int.parse(b.id).compareTo(int.parse(a.id)));
+  // Future<void> fetchShops() async {
+    // if (_shopsFetched) return; // 如果已经获取了数据，就不再执行
+    // _shopsFetched = true; // 标记为已获取数据
 
-      final firestore = FirebaseFirestore.instance;
-      final petShopsCollection = firestore.collection('petShops');
+    // final response = await http.get(Uri.parse(
+        // 'https://data.moa.gov.tw/Service/OpenData/TransService.aspx?UnitId=fNT9RMo8PQRO&\$top=5000&\$skip=0'));
+       //https://data.moa.gov.tw/Service/OpenData/TransService.aspx?UnitId=fNT9RMo8PQRO&$top=5000&$skip=0
 
-      // 使用Map来记录已处理的legalname
-      final Map<String, petShop> addedShops = {};
+    // if (response.statusCode == 200) {
+      // final List<dynamic> jsonData = json.decode(response.body);
+//      // 解析并排序（根据ID降序排列）
+      // final List<petShop> shops =
+          // jsonData.map((item) => petShop.fromJson(item)).toList();
+      // shops.sort((a, b) => int.parse(b.id).compareTo(int.parse(a.id)));
 
-      for (var shop in shops) {
-        // 如果validdate已过期或者已添加了相同legalname的最新记录，则跳过
-        final DateTime validDate = parseValidDate(shop.validDate);
-        if (validDate.isBefore(DateTime.now()) ||
-            addedShops.containsKey(shop.legalName)) continue;
+      // final firestore = FirebaseFirestore.instance;
+      // final petShopsCollection = firestore.collection('petShops');
 
-// 检查Firestore中是否已存在
-        var existingDoc = await petShopsCollection
-            .where('legalName', isEqualTo: shop.legalName)
-            .get();
+//     //使用Map来记录已处理的legalname
+      // final Map<String, petShop> addedShops = {};
 
-        if (existingDoc.docs.isEmpty) {
-          // 如果不存在，则添加到Firestore和addedShops记录中
-          await petShopsCollection.add(shop.toMap());
-          addedShops[shop.legalName] = shop; // 添加记录
-          print(
-              "Added shop with legalName: ${shop.legalName} and ID: ${shop.id}"); // 使用正确的属性名
-        } else {
-          // 这家商店已经存在
-          print("Skipped existing shop with legalName: ${shop.legalName}");
+      // for (var shop in shops) {
+        // final DateTime validDate = parseValidDate(shop.validDate);
+        // if (validDate.isBefore(DateTime.now()) ||
+            // addedShops.containsKey(shop.legalName)) continue;
+
+        // var existingDoc = await petShopsCollection
+            // .where('legalName', isEqualTo: shop.legalName)
+            // .get();
+
+        // if (existingDoc.docs.isEmpty) {
+//          //设置默认值
+          // shop.roomCollection['獨立房型'] ??= {
+            // '小型犬': 0,
+            // '中型犬': 0,
+            // '大型犬': 0,
+            // '貓': 0
+          // };
+          // shop.roomCollection['開放式住宿'] ??= {
+            // '小型犬': 0,
+            // '中型犬': 0,
+            // '大型犬': 0,
+            // '貓': 0
+          // };
+          // shop.roomCollection['半開放式住宿'] ??= {
+            // '小型犬': 0,
+            // '中型犬': 0,
+            // '大型犬': 0,
+            // '貓': 0
+          // };
+          // shop.petGrooming['小美容'] ??= {'小型犬': 0, '中型犬': 0, '大型犬': 0, '貓': 0};
+          // shop.petGrooming['大美容'] ??= {'小型犬': 0, '中型犬': 0, '大型犬': 0, '貓': 0};
+
+//         // 添加到 Firestore
+          // await petShopsCollection.add(shop.toMap());
+          // addedShops[shop.legalName] = shop;
+          // print(
+              // "Added shop with legalName: ${shop.legalName} and ID: ${shop.id}");
+        // } else {
+          // print("Skipped existing shop with legalName: ${shop.legalName}");
+        // }
+      // }
+
+      // state = addedShops.values.toList();
+    // } else {
+      // _shopsFetched = false;
+      // throw Exception('Failed to fetch shops data');
+    // }
+  // }
+
+  // 添加多张照片到 Firebase Storage
+  Future<void> uploadAlbum(
+      List<File> images, String shopName, LocalUser currentUser) async {
+    {
+      CollectionReference petShopsCollection = firestore.collection('petShops');
+      QuerySnapshot querySnapshot = await petShopsCollection
+          .where('uid', isEqualTo: currentUser.user.phone)
+          .limit(1) // 限制只获取一个匹配的文档
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        String shopId = querySnapshot.docs.first.id;
+
+        List<String> imageUrls = [];
+        int counter = 0;
+        print('uploadAlbum的shopName:$shopName');
+        print('uploadAlbum的shopId:$shopId');
+
+        // 上傳到store, Upload each image and collect URLs
+        for (var image in images) {
+          String fileName =
+              'petshop/$shopName/${DateTime.now().millisecondsSinceEpoch}_$counter.jpg';
+          counter++;
+          UploadTask uploadTask = storage.ref(fileName).putFile(image);
+          TaskSnapshot snapshot = await uploadTask;
+          String imageUrl = await snapshot.ref.getDownloadURL();
+          imageUrls.add(imageUrl);
         }
+        // 上傳到firestore, Update Firestore document
+        try {
+          await firestore
+              .collection('petShops')
+              .doc(shopId)
+              .update({'album': FieldValue.arrayUnion(imageUrls)});
+          print('Images uploaded and Firestore updated.');
+        } catch (e) {
+          print('Error uploading images to Firebase: $e');
+        }
+      } else {
+        print('No shop found for the current user.');
+        return;
       }
-
-      // 更新状态
-      state = addedShops.values.toList();
-    } else {
-      _shopsFetched = false; // 如果失败，重置标志以允许重新尝试
-      throw Exception('Failed to fetch shops data');
     }
   }
 
   //從firestore抓資料
   Future<List<petShop>> fetchFirestoreShops() async {
-    final firestore = FirebaseFirestore.instance;
     CollectionReference petShopsCollection = firestore.collection('petShops');
 
     QuerySnapshot querySnapshot = await petShopsCollection.get();
@@ -105,14 +170,33 @@ class ShopsNotifier extends StateNotifier<List<petShop>> {
     }
   }
 
+  //取得單獨商家資料
+  Future<petShop> getShopData(LocalUser currentUser) async {
+    final petShopsCollection = firestore.collection('petShops');
+
+    final querySnapshot = await petShopsCollection
+        .where('uid', isEqualTo: currentUser.user.phone)
+        .limit(1)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      final shopData = querySnapshot.docs.first.data();
+      print("getShopData: $shopData"); // 打印获取到的数据
+      final shop = petShop.fromMap(shopData);
+      return shop;
+    } else {
+      throw Exception("No shop found for the current user.");
+    }
+  }
+
+  //沒用到->參考用
   Future<void> postPrice(int updatedprice, LocalUser currentUser) async {
-    final firestore = FirebaseFirestore.instance;
     CollectionReference petShopsCollection = firestore.collection('petShops');
-    print(' currentUser.user.name:' + currentUser.user.name);
-    print(' currentUser.id:' + currentUser.id);
-    //手動去更新商家的uid讓他跟currentUser的name一樣，即可判斷誰可以更新加錢。
+    print(' currentUser.user.name:${currentUser.user.name}');
+    print(' currentUser.id:${currentUser.id}');
+    //手動去更新商家的uid讓他跟currentUser的phone一樣，即可判斷誰可以更新價錢。
     QuerySnapshot querySnapshot = await petShopsCollection
-        .where('uid', isEqualTo: currentUser.user.name)
+        .where('uid', isEqualTo: currentUser.user.phone)
         .limit(1) // 限制只获取一个匹配的文档
         .get();
     // print('Query Snapshot: $querySnapshot');
@@ -132,23 +216,46 @@ class ShopsNotifier extends StateNotifier<List<petShop>> {
     }
   }
 
-  Future<void> changeRoom(
-      Map<String, bool> updatedRoomCollection, LocalUser currentUser) async {
-    final firestore = FirebaseFirestore.instance;
+  Future<void> changeIntro(String updatedIntro, LocalUser currentUser) async {
     CollectionReference petShopsCollection = firestore.collection('petShops');
-      //可判斷誰可以更改。
     QuerySnapshot querySnapshot = await petShopsCollection
-        .where('uid', isEqualTo: currentUser.user.name)
+        .where('uid', isEqualTo: currentUser.user.phone)
         .limit(1)
         .get();
+    if (querySnapshot.docs.isNotEmpty) {
+      String shopId = querySnapshot.docs.first.id;
+      try {
+        await petShopsCollection
+            .doc(shopId)
+            .update({'introduction': updatedIntro});
+        print('Intro updated successfully');
+      } catch (e) {
+        print('Error updating Intro: $e');
+      }
+    } else {
+      print('No matching document found');
+    }
+  }
+
+  Future<void> changeRoomPrice(
+      Map<String, Map<String, int>> updatedRoomCollection,
+      LocalUser currentUser) async {
+    CollectionReference petShopsCollection = firestore.collection('petShops');
+    print('Querying for uid: ${currentUser.user.phone}');
+    QuerySnapshot querySnapshot = await petShopsCollection
+        .where('uid', isEqualTo: currentUser.user.phone)
+        .limit(1)
+        .get();
+    print('Found ${querySnapshot.docs.length} matching documents');
 
     if (querySnapshot.docs.isNotEmpty) {
       String shopId = querySnapshot.docs.first.id;
 
       try {
-        await petShopsCollection
-            .doc(shopId)
-            .update({'roomCollection': updatedRoomCollection});
+        await petShopsCollection.doc(shopId).update({
+          'roomCollection': updatedRoomCollection.map((key, value) => MapEntry(
+              key, value.map((subKey, subValue) => MapEntry(subKey, subValue))))
+        });
         print('Room collection updated successfully');
       } catch (e) {
         print('Error updating room collection: $e');
@@ -158,13 +265,38 @@ class ShopsNotifier extends StateNotifier<List<petShop>> {
     }
   }
 
+  Future<void> changeGroomingPrice(
+      Map<String, Map<String, int>> updatedGroomingCollection,
+      LocalUser currentUser) async {
+    CollectionReference petShopsCollection = firestore.collection('petShops');
+    print('Querying for uid: ${currentUser.user.phone}');
+    QuerySnapshot querySnapshot = await petShopsCollection
+        .where('uid', isEqualTo: currentUser.user.phone)
+        .limit(1)
+        .get();
+    print('Found ${querySnapshot.docs.length} matching documents');
+    if (querySnapshot.docs.isNotEmpty) {
+      String shopId = querySnapshot.docs.first.id;
+      try {
+        await petShopsCollection.doc(shopId).update({
+          'petGrooming': updatedGroomingCollection.map((key, value) => MapEntry(
+              key, value.map((subKey, subValue) => MapEntry(subKey, subValue))))
+        });
+        print('Grooming collection updated successfully');
+      } catch (e) {
+        print('Error updating Grooming collection: $e');
+      }
+    } else {
+      print('No matching document found');
+    }
+  }
+
   Future<void> changeFoodChoice(
       Map<String, bool> updatedFoodChoice, LocalUser currentUser) async {
-    final firestore = FirebaseFirestore.instance;
     CollectionReference petShopsCollection = firestore.collection('petShops');
 
     QuerySnapshot querySnapshot = await petShopsCollection
-        .where('uid', isEqualTo: currentUser.user.name)
+        .where('uid', isEqualTo: currentUser.user.phone)
         .limit(1)
         .get();
 
@@ -187,11 +319,10 @@ class ShopsNotifier extends StateNotifier<List<petShop>> {
   Future<void> changeServiceAndFacilities(
       Map<String, bool> updatedServiceAndFacilities,
       LocalUser currentUser) async {
-    final firestore = FirebaseFirestore.instance;
     CollectionReference petShopsCollection = firestore.collection('petShops');
 
     QuerySnapshot querySnapshot = await petShopsCollection
-        .where('uid', isEqualTo: currentUser.user.name)
+        .where('uid', isEqualTo: currentUser.user.phone)
         .limit(1)
         .get();
 
@@ -213,11 +344,10 @@ class ShopsNotifier extends StateNotifier<List<petShop>> {
 
   Future<void> changeMedicalNeeds(
       Map<String, bool> updatedMedicalNeeds, LocalUser currentUser) async {
-    final firestore = FirebaseFirestore.instance;
     CollectionReference petShopsCollection = firestore.collection('petShops');
 
     QuerySnapshot querySnapshot = await petShopsCollection
-        .where('uid', isEqualTo: currentUser.user.name)
+        .where('uid', isEqualTo: currentUser.user.phone)
         .limit(1)
         .get();
 
@@ -237,10 +367,10 @@ class ShopsNotifier extends StateNotifier<List<petShop>> {
     }
   }
 
+  //用戶評論商家
   Future<void> addReview(String customShopId, Review newReview) async {
-    final firestore = FirebaseFirestore.instance;
-
-    // 使用自定义字段查询文档
+    //使用商家的id查询文档，並加入評論的欄位，petshops裡面的id。
+    //可能要改方式
     QuerySnapshot querySnapshot = await firestore
         .collection('petShops')
         .where('id', isEqualTo: customShopId)
@@ -251,7 +381,7 @@ class ShopsNotifier extends StateNotifier<List<petShop>> {
       // 获取第一个匹配的文档引用
       DocumentReference shopDocRef = querySnapshot.docs.first.reference;
 
-      // 进行更新操作
+      // 進行更新操作
       await firestore.runTransaction((transaction) async {
         DocumentSnapshot snapshot = await transaction.get(shopDocRef);
         if (!snapshot.exists) {
@@ -278,14 +408,14 @@ class ShopsNotifier extends StateNotifier<List<petShop>> {
     }
   }
 
-  Future<void> addShopResponse(
-      LocalUser currentUser, String reviewTimestamp, String responseContent) async {
-    final firestore = FirebaseFirestore.instance;
-    print('responseContent::' + responseContent);
+  //商家回覆用戶，只有商家可以回覆
+  Future<void> addShopResponse(LocalUser currentUser, String reviewTimestamp,
+      String responseContent) async {
+    print('responseContent::$responseContent');
     // 获取包含要更新评论的 petShop 文档
     QuerySnapshot querySnapshot = await firestore
         .collection('petShops')
-        .where('uid', isEqualTo: currentUser.user.name)
+        .where('uid', isEqualTo: currentUser.user.phone)
         .get();
     DocumentReference shopDocRef = querySnapshot.docs.first.reference;
     await firestore.runTransaction((transaction) async {

@@ -11,7 +11,7 @@ class MessageBox extends ConsumerStatefulWidget {
   final String currentUserId;
   final String shopName;
 
-  MessageBox({required this.currentUserId, required this.shopName});
+  const MessageBox({super.key, required this.currentUserId, required this.shopName});
 
   @override
   _MessageBoxState createState() => _MessageBoxState();
@@ -30,16 +30,15 @@ class _MessageBoxState extends ConsumerState<MessageBox> {
 
   @override
   Widget build(BuildContext context) {
-    print("当前用户ID: ${widget.currentUserId}"); // 打印当前用户ID
+    print("訊息內當前用戶ID: ${widget.currentUserId}"); // 打印当前用户ID
 
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.shopName),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        backgroundColor: Color.fromARGB(255, 226, 160, 182),
       ),
       body: Column(
         children: [
@@ -54,11 +53,11 @@ class _MessageBoxState extends ConsumerState<MessageBox> {
                   stream: messagesStream,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
+                      return const Center(child: CircularProgressIndicator());
                     }
 
                     if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return Center(child: Text("No messages"));
+                      return const Center(child: Text("No messages"));
                     } else {
                       // 为了调试，打印出返回的消息
                       for (var msg in snapshot.data!) {
@@ -89,14 +88,11 @@ class _MessageBoxState extends ConsumerState<MessageBox> {
                         if (message.timestamp is Timestamp) {
                           // 如果 timestamp 是 Timestamp 类型，则转换为 DateTime
                           dateTime = (message.timestamp as Timestamp).toDate();
-                        } else if (message.timestamp is DateTime) {
-                          // 如果 timestamp 已经是 DateTime 类型，则直接使用
-                          dateTime = message.timestamp;
                         } else {
-                          // 如果 timestamp 既不是 Timestamp 也不是 DateTime 类型，
-                          // 可能需要处理错误或分配一个默认值
-                          dateTime = DateTime.now(); // 示例：分配当前时间作为默认值
+                          // 如果 timestamp 已经是 DateTime 类型，则直接使用
+                        dateTime = message.timestamp;
                         }
+                      
 
                         return Padding(
                           padding: const EdgeInsets.symmetric(
@@ -107,7 +103,7 @@ class _MessageBoxState extends ConsumerState<MessageBox> {
                                 ? Alignment.centerRight
                                 : Alignment.centerLeft,
                             child: Container(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   vertical: 10, horizontal: 16),
                               decoration: BoxDecoration(
                                 color: isSentByMe
@@ -125,7 +121,7 @@ class _MessageBoxState extends ConsumerState<MessageBox> {
                                             ? Colors.white
                                             : Colors.black),
                                   ),
-                                  SizedBox(height: 5),
+                                  const SizedBox(height: 5),
                                   Text(
                                     DateFormat('yyyy-MM-dd – kk:mm')
                                         .format(dateTime),
@@ -145,23 +141,37 @@ class _MessageBoxState extends ConsumerState<MessageBox> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(20.0),
             child: Row(
               children: <Widget>[
                 Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    decoration: InputDecoration(
-                      hintText: 'Enter a message',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5.0),
+                  child: Material(
+                    // 使用 Material 组件包裹 TextField
+                    elevation: 2.0, // 添加阴影效果
+                    borderRadius: BorderRadius.circular(5.0), // 设置边框圆角
+                    child: Container(
+                      child: TextField(
+                        controller: _messageController,
+                        decoration: InputDecoration(
+                          hintText: '輸入訊息',
+                          border: OutlineInputBorder(
+                            // 使用 OutlineInputBorder 设置边框样式
+                            borderRadius: BorderRadius.circular(5.0), // 设置边框圆角
+                            borderSide: BorderSide.none, // 隐藏默认边框
+                          ),
+                          filled: true, // 启用填充颜色
+                          fillColor:
+                              const Color.fromRGBO(255, 239, 239, 1.0), // 设置背景色
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10.0, horizontal: 10.0), // 设置内边距
+                        ),
                       ),
                     ),
                   ),
                 ),
-                SizedBox(width: 8.0),
+                const SizedBox(width: 8.0),
                 IconButton(
-                  icon: Icon(Icons.send),
+                  icon: const Icon(Icons.send),
                   onPressed: () {
                     if (_messageController.text.isNotEmpty) {
                       ref.read(messageProvider).sendMessage(

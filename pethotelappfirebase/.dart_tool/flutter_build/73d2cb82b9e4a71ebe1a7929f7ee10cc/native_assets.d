@@ -1,0 +1,1 @@
+ /Users/x/Desktop/PethotelFirebase/pethotelappfirebase/.dart_tool/flutter_build/73d2cb82b9e4a71ebe1a7929f7ee10cc/native_assets.yaml: 

@@ -4,17 +4,20 @@ import '../pages/search.dart';
 import '../pages/more.dart';
 import '../pages/message.dart';
 import '../pages/orderPage.dart';
+import '../pages/orderShopPage.dart';
 
 import '../providers/navigator_provider.dart';
 import '../providers/user_provider.dart';
 
 class NavigatorPage extends StatelessWidget {
+  const NavigatorPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Color.fromARGB(255, 230, 228, 228), // 设置底部导航栏的背景颜色
-      child: Padding(
-        padding: const EdgeInsets.all(14.0),
+      color: const Color.fromARGB(255, 230, 228, 228), // 设置底部导航栏的背景颜色
+      child: const Padding(
+        padding: EdgeInsets.all(14.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly, // 水平均匀分布按钮
           children: [
@@ -34,7 +37,7 @@ class NavigationButton extends ConsumerWidget {
   final String label;
   final IconData iconData;
 
-  NavigationButton(this.index, this.label, this.iconData);
+  const NavigationButton(this.index, this.label, this.iconData, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -68,14 +71,17 @@ class NavigationButton extends ConsumerWidget {
         if (selectedIndex == 0) {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => SearchPage()),
+            MaterialPageRoute(builder: (context) => const SearchPage()),
           );
           // print("searchPAge");
         } else if (selectedIndex == 1) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => OrderPage()),
-          );
+          if(currentUser.user.isShopOwner) {
+            // 如果是店铺所有者，跳转到 OrderShopPage
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const OrderShopPage()));
+          } else {
+            // 如果不是店铺所有者，跳转到 OrderPage
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const OrderPage()));
+          }
         } else if (selectedIndex == 2) {
           Navigator.push(
             context,
@@ -87,10 +93,12 @@ class NavigationButton extends ConsumerWidget {
         } else if (selectedIndex == 3) {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => MorePage()),
+            MaterialPageRoute(builder: (context) => const MorePage()),
           );
         }
       },
+      highlightColor: Colors.transparent, // 设置点击高亮颜色为透明
+      splashColor: Colors.transparent,
       child: Container(
         width: buttonWidth,
         height: 50,
@@ -99,21 +107,19 @@ class NavigationButton extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(iconData,
-                size: iconSize, color: Color.fromARGB(255, 13, 13, 13)),
-            SizedBox(width: 8),
+                size: iconSize, color: const Color.fromARGB(255, 13, 13, 13)),
+            const SizedBox(width: 8),
             Text(
               label,
               style: TextStyle(
-                color: Color.fromARGB(255, 13, 13, 13),
+                color: const Color.fromARGB(255, 13, 13, 13),
                 fontSize: fontSize,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ],
         ),
-      ),
-      highlightColor: Colors.transparent, // 设置点击高亮颜色为透明
-      splashColor: Colors.transparent, // 设置点击溅墨颜色为透明
+      ), // 设置点击溅墨颜色为透明
     );
   }
 }

@@ -2,10 +2,11 @@
 import 'dart:io'; // Make sure to include this import
 
 import 'package:firebase_storage/firebase_storage.dart';
-import '../models/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../models/user.dart';
 
 final userProvider = StateNotifierProvider<UserNotifier, LocalUser>((ref) {
   return UserNotifier();
@@ -40,9 +41,8 @@ class UserNotifier extends StateNotifier<LocalUser> {
             ),
           ),
         );
-  //firestore
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  //store
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
   //登入
@@ -86,23 +86,23 @@ class UserNotifier extends StateNotifier<LocalUser> {
   }
 
   // 一般用戶註冊
-  Future<void> signUpwemail(String phone) async {
-    DocumentReference response = await _firestore.collection("users").add(
-          FirebaseUser(
-            phone: phone,
-            name: "No Name",
-            profilePic: "https://i.imgur.com/ZX0PtRb.png",
-            isShopOwner: false, // 設定為 false
-            shops: [],
-          ).toMap(),
-        );
+  // Future<void> signUpwemail(String phone) async {
+    // DocumentReference response = await _firestore.collection("users").add(
+          // FirebaseUser(
+            // phone: phone,
+            // name: "No Name",
+            // profilePic: "https://i.imgur.com/ZX0PtRb.png",
+            // isShopOwner: false, // 設定為 false
+            // shops: [],
+          // ).toMap(),
+        // );
 
-    DocumentSnapshot snapshot = await response.get();
-    state = LocalUser(
-      id: response.id,
-      user: FirebaseUser.fromMap(snapshot.data() as Map<String, dynamic>),
-    );
-  }
+    // DocumentSnapshot snapshot = await response.get();
+    // state = LocalUser(
+      // id: response.id,
+      // user: FirebaseUser.fromMap(snapshot.data() as Map<String, dynamic>),
+    // );
+  // }
 
   // 店家註冊
   Future<void> shopSignUp(String phone, String name) async {
@@ -128,7 +128,7 @@ class UserNotifier extends StateNotifier<LocalUser> {
     state = state.copyWith(user: state.user.copyWith(name: name));
   }
 
-  //updateImage
+  //更新圖片
   Future<void> updateImage(File image) async {
     //we want a folder in our storage
     Reference ref = _storage.ref().child("users").child(state.id);
@@ -144,7 +144,30 @@ class UserNotifier extends StateNotifier<LocalUser> {
         state.copyWith(user: state.user.copyWith(profilePic: profilePicUrl));
   }
 
-  //登出
+  //刪除使用者資料
+  Future<void> deleteUser() async {
+  try {
+    // 獲取當前用戶的 Firebase Authentication 紀錄
+    User? currentUser = _auth.currentUser;
+    if (currentUser == null) {
+      throw Exception('No user is currently signed in.');
+    }
+
+    // 刪除 Firestore 中的用戶文檔
+    await _firestore.collection("users").doc(state.id).delete();
+
+    // 刪除 Firebase Authentication 紀錄
+    await currentUser.delete();
+
+    // 重設狀態
+    logout(); // 假設 logout 重設了狀態，如之前提供的代碼所示
+  } catch (e) {
+    print('Failed to delete user: $e');
+    throw Exception('Failed to delete user: ${e.toString()}');
+  }
+}
+
+  // Update existing logout method to just clear state
   void logout() {
     state = const LocalUser(
       id: "error",
@@ -152,7 +175,7 @@ class UserNotifier extends StateNotifier<LocalUser> {
         phone: "error",
         name: "error",
         profilePic: "error",
-        isShopOwner: false, // 設定為 false //?????但這樣登出後店家登入會不會被當作一般的使用者
+        isShopOwner: false,
         shops: [],
       ),
     );

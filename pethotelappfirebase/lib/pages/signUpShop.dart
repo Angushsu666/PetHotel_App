@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:flutter/services.dart'; // 匯入 services 庫來使用 LengthLimitingTextInputFormatter
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -23,38 +23,57 @@ class _ShopSignUpState extends ConsumerState<ShopSignUp> {
   final GlobalKey<FormState> _signInKey = GlobalKey();
   bool _isChecked = false; // 用于跟踪勾选框的状态
 
-  String? _verificationId;
+  final ValueNotifier<int> _charCount = ValueNotifier(0); // Character count notifier
 
+  @override
+  void initState() {
+    super.initState();
+    _nameController.addListener(() {
+      _charCount.value = _nameController.text.length; // Update character count
+    });
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _charCount.dispose(); // Dispose of the ValueNotifier
+    super.dispose();
+  }
+
+  String? _verificationId;
+  int? _resendToken;
   final String _countryCode = '+886';
 
   Future<void> _verifyPhoneNumber() async {
-    // 检查手机号码是否已注册
+    // Formatting the phone number to include the country code
+    String formattedPhoneNumber = _formatPhoneNumber(_phoneController.text);
+    print('formattedPhoneNumber:$formattedPhoneNumber');
+    // Check if phone number is already registered
     final QuerySnapshot result = await FirebaseFirestore.instance
         .collection('users')
-        .where('phone', isEqualTo: '$_countryCode${_phoneController.text}')
+        .where('phone', isEqualTo: formattedPhoneNumber)
         .limit(1)
         .get();
-
     if (result.docs.isNotEmpty) {
-      // 手机号码已注册
+      // Phone number has already been registered
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('此手機號碼已經註冊過')),
+        const SnackBar(content: Text('此手機號碼已經註冊過')),
       );
-      return; // 结束函数执行
+      return; // Stop the function execution
     }
-
     // 手机号码未注册，继续发送验证码
     await _auth.verifyPhoneNumber(
       phoneNumber: '$_countryCode${_phoneController.text}',
       verificationCompleted: (PhoneAuthCredential credential) async {
         // 自动完成验证
-        await _auth.signInWithCredential(credential);
+        // await _auth.signInWithCredential(credential);
       },
       codeSent: (String verificationId, int? resendToken) {
         // 验证码已发送
         print("Verification ID received: $verificationId");
         setState(() {
           _verificationId = verificationId;
+          _resendToken = resendToken;
         });
       },
       codeAutoRetrievalTimeout: (String verificationId) {
@@ -63,14 +82,23 @@ class _ShopSignUpState extends ConsumerState<ShopSignUp> {
           _verificationId = verificationId;
         });
       },
+      timeout: const Duration(seconds: 60),
+      forceResendingToken: _resendToken,
       verificationFailed: (FirebaseAuthException e) {
         // 验证失败
         print(e.toString());
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('验证失败，请重试。错误信息：${e.message}')),
+          SnackBar(content: Text('驗證失敗，請重試。錯誤訊息：${e.message}')),
         );
       },
     );
+  }
+
+  String _formatPhoneNumber(String rawNumber) {
+    if (rawNumber.startsWith('0')) {
+      return '$_countryCode${rawNumber.substring(1)}';
+    }
+    return '$_countryCode$rawNumber';
   }
 
   Future<void> _verifyOTP() async {
@@ -99,7 +127,7 @@ class _ShopSignUpState extends ConsumerState<ShopSignUp> {
           // 跳转到主页
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => SearchPage()),
+            MaterialPageRoute(builder: (context) => const SearchPage()),
           );
         }
       } catch (e) {
@@ -109,9 +137,7 @@ class _ShopSignUpState extends ConsumerState<ShopSignUp> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content:
-                Text("Verification ID is null. Please request OTP again.")),
+        const SnackBar(content: Text("驗證碼錯誤，請重新要求驗證碼。")),
       );
     }
   }
@@ -152,26 +178,46 @@ class _ShopSignUpState extends ConsumerState<ShopSignUp> {
                 ),
                 const SizedBox(height: 20),
                 // 新增用户名输入字段
+
+                // Username input field and character count
                 Container(
                   margin: const EdgeInsets.fromLTRB(15, 0, 15, 0),
                   decoration: BoxDecoration(
                     color: Colors.grey.shade200,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: TextFormField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      hintText: '用戶名',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ), // 移除输入框底线
-                      contentPadding: EdgeInsets.symmetric(
-                        vertical: 15,
-                        horizontal: 20,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _nameController,
+                        decoration: InputDecoration(
+                          hintText: '商家店名',
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 15, horizontal: 20),
+                        ),
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(20),
+                        ],
                       ),
-                    ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 10.0),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: ValueListenableBuilder<int>(
+                            valueListenable: _charCount,
+                            builder: (_, value, __) {
+                              return Text('$value/20',
+                                  style: TextStyle(color: Colors.grey[600]));
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+
                 const SizedBox(height: 20),
 
                 Container(
@@ -185,7 +231,7 @@ class _ShopSignUpState extends ConsumerState<ShopSignUp> {
                     keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
                       labelText: '手機號碼',
-                      prefixText: '$_countryCode ',
+                      // prefixText: '$_countryCode ',
                       prefixStyle: const TextStyle(
                         fontSize: 16,
                         color: Colors.black,
@@ -206,16 +252,16 @@ class _ShopSignUpState extends ConsumerState<ShopSignUp> {
                           "Error occurred during phone number verification: $e");
                     }
                   },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(
+                        const Color.fromRGBO(255, 239, 239, 1.0)),
+                  ),
                   child: const Text(
                     '發送驗證碼',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.black45,
                     ),
-                  ),
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(
-                        Color.fromRGBO(255, 239, 239, 1.0)),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -233,7 +279,7 @@ class _ShopSignUpState extends ConsumerState<ShopSignUp> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ), // 移除输入框底线
-                      contentPadding: EdgeInsets.symmetric(
+                      contentPadding: const EdgeInsets.symmetric(
                         vertical: 15,
                         horizontal: 20,
                       ),
@@ -264,7 +310,7 @@ class _ShopSignUpState extends ConsumerState<ShopSignUp> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  PrivacyPolicyPage()), // 假设 PrivacyPolicyPage 是隐私政策的页面
+                                  const PrivacyPolicyPage()), // 假设 PrivacyPolicyPage 是隐私政策的页面
                         );
                       },
                       child: const Text(
@@ -282,19 +328,19 @@ class _ShopSignUpState extends ConsumerState<ShopSignUp> {
                           }
                         }
                       : null,
-                  child: const Text(
-                    '立即註冊',
-                    style: TextStyle(color: Colors.black45),
-                  ),
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.resolveWith<Color>(
                       (Set<MaterialState> states) {
                         if (_isChecked) {
-                          return Color.fromRGBO(255, 239, 239, 1.0);
+                          return const Color.fromRGBO(255, 239, 239, 1.0);
                         }
                         return Colors.grey;
                       },
                     ),
+                  ),
+                  child: const Text(
+                    '立即註冊',
+                    style: TextStyle(color: Colors.black45),
                   ),
                 ),
                 TextButton(

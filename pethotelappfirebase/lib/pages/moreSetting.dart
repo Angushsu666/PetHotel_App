@@ -2,7 +2,6 @@ import 'dart:io';
 //import 'dart:html' as html; // Import dart:html for Blob
 import 'dart:typed_data';
 import 'package:image_picker/image_picker.dart';
-import 'package:image/image.dart' as img;
 import 'package:path/path.dart' as path;
 
 import 'package:flutter/material.dart';
@@ -34,7 +33,7 @@ class _settingsState extends ConsumerState<settings> {
                 final ImagePicker picker = ImagePicker();
                 // // Pick an image.
                 // final XFile? pickedImage = await picker.pickImage(
-                //     source: ImageSource.gallery, requestFullMetadata: false);
+                //     source: ImageSource.gallery, requestFullMetadata: false);ㄓ
                 // // Capture a photo.
                 // if (pickedImage != null) {
                 //   ref
@@ -68,10 +67,10 @@ class _settingsState extends ConsumerState<settings> {
                 foregroundImage: NetworkImage(currentUser.user.profilePic),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
-            Center(
+            const Center(
               child: Text("Tap image to Change"),
             ),
             //Update Name

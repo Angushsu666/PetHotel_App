@@ -9,27 +9,28 @@ final messageProvider = Provider((ref) => MessageProvider());
 class MessagesListPage extends ConsumerWidget {
   final String currentUserName;
 
-  MessagesListPage({required this.currentUserName});
+  const MessagesListPage({super.key, required this.currentUserName});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('訊息'),
+        title: const Text('訊息頁面'),
       ),
       body: Consumer(
         builder: (context, ref, _) {
-          final messagesStream = ref.watch(messageProvider).getUserMessages(currentUserName);
-
+          final messagesStream =
+              ref.watch(messageProvider).getUserMessages(currentUserName);
+          print(currentUserName);
           return StreamBuilder<List<Message>>(
             stream: messagesStream,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               }
 
               if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return Center(child: Text("No messages"));
+                return const Center(child: Text("目前沒有訊息"));
               }
 
               // 分组并找到每组的最新消息
@@ -42,26 +43,36 @@ class MessagesListPage extends ConsumerWidget {
                   Message latestMessage = entry.value;
 
                   // 根据消息的发送者和接收者调整UI
-                  bool isCurrentUserSender = latestMessage.senderName == currentUserName;
-                  String displayTitle = isCurrentUserSender ? latestMessage.receiverLegalName : latestMessage.senderName;
+                  bool isCurrentUserSender =
+                      latestMessage.senderName == currentUserName;
+                  String displayTitle = isCurrentUserSender
+                      ? latestMessage.receiverLegalName
+                      : latestMessage.senderName;
 
                   return ListTile(
-                    title: Text(displayTitle), // 显示对方的名称
-                    subtitle: Text(latestMessage.messageContent),
+                    title: Text(displayTitle,
+                        style: const TextStyle(
+                            fontSize: 16, color: Colors.black)), // 显示对方的名称
+                    subtitle: Text(latestMessage.messageContent,
+                        style: const TextStyle(fontSize: 12, color: Colors.black45)),
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => MessageBox(
                             currentUserId: currentUserName,
-                            shopName: isCurrentUserSender ? latestMessage.receiverLegalName : latestMessage.senderName, // 根据当前用户角色调整shopName
+                            shopName: isCurrentUserSender
+                                ? latestMessage.receiverLegalName
+                                : latestMessage
+                                    .senderName, // 根据当前用户角色调整shopName
                           ),
                         ),
                       );
                     },
                   );
                 },
-                separatorBuilder: (context, index) => Divider(color: Colors.grey[300]), // 添加分隔线
+                separatorBuilder: (context, index) =>
+                    Divider(color: Colors.grey[300]), // 添加分隔线
               );
             },
           );
@@ -75,10 +86,13 @@ class MessagesListPage extends ConsumerWidget {
 
     for (var message in messages) {
       // 选择显示逻辑：若当前用户为发送者，则key为接收者；若当前用户为接收者，则key为发送者
-      String key = message.senderName == currentUserName ? message.receiverLegalName : message.senderName;
+      String key = message.senderName == currentUserName
+          ? message.receiverLegalName
+          : message.senderName;
 
       var existingMessage = latestMessages[key];
-      if (existingMessage == null || existingMessage.timestamp.isBefore(message.timestamp)) {
+      if (existingMessage == null ||
+          existingMessage.timestamp.isBefore(message.timestamp)) {
         latestMessages[key] = message;
       }
     }

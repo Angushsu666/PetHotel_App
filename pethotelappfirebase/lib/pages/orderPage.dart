@@ -2,127 +2,129 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../components/navigator.dart';
 import '../providers/order_provider.dart';
-import '../models/Order.dart' as model; // Use the 'model' prefix here as well
+import '../models/Order.dart' as model;
+import '../providers/user_provider.dart';
+import '../providers/shop_provider.dart';
 
-class OrderPage extends ConsumerWidget {
+class OrderPage extends ConsumerStatefulWidget {
+  const OrderPage({super.key});
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  _OrderPageState createState() => _OrderPageState();
+}
+
+class _OrderPageState extends ConsumerState<OrderPage> {
+  String currentStatus = '交易成功'; // Default to show effective orders
+
+  void updateStatus(String newStatus) {
+    setState(() {
+      currentStatus = newStatus;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     AsyncValue<List<model.Order>> orders = ref.watch(orderProvider);
+    LocalUser currentUser = ref.watch(userProvider);
+    print('currentUser: ${currentUser.user.phone}');
+    Future<void> printShopId() async {
+      final shop =
+          await ref.read(shopsProvider.notifier).getShopData(currentUser);
+      print('shop.id: ${shop.id}');
+    }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('訂單'),
+        title: const Text('訂單'),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        backgroundColor: Color.fromRGBO(255, 239, 239, 1.0),
+        backgroundColor: const Color.fromRGBO(255, 239, 239, 1.0),
       ),
       body: Column(
         children: [
+          // Buttons for switching between order types
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Handle effective orders button tap
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.white),
-                    foregroundColor: MaterialStateProperty.all(Colors.pink),
-                  ),
-                  child: Text('有效訂單'),
+              ElevatedButton(
+                onPressed: () => updateStatus('交易成功'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: currentStatus == '交易成功'
+                      ? const Color.fromRGBO(255, 239, 239, 1.0)
+                      : Colors.grey,
                 ),
+                child: const Text('有效訂單'),
               ),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Handle past orders button tap
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.white),
-                    foregroundColor: MaterialStateProperty.all(Colors.black),
-                  ),
-                  child: Text('過去訂單'),
+              const SizedBox(width: 20),
+              ElevatedButton(
+                onPressed: () => updateStatus('未支付'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: currentStatus == '未支付'
+                      ? const Color.fromRGBO(255, 239, 239, 1.0)
+                      : Colors.grey,
                 ),
+                child: const Text('未完成訂單'),
               ),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Handle cancelled orders button tap
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.white),
-                    foregroundColor: MaterialStateProperty.all(Colors.black),
-                  ),
-                  child: Text('已取消訂單'),
-                ),
-              ),
-            ],
+            ]
           ),
+          // Displaying the filtered orders
           Expanded(
             child: orders.when(
-              data: (orders) {
+              data: (allOrders) {
+                // Filter orders by current user and status
+                List<model.Order> filteredOrders = allOrders
+                    .where((order) =>
+                        order.userId == currentUser.user.name &&
+                        order.status == currentStatus)
+                    .toList();
+                
                 return ListView.builder(
-                  itemCount: orders.length,
-                  itemBuilder: (context, index) {
-                    var order = orders[index];
-                    return Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            Image.network(
-                              order.imageUrl,
-                              width: 100,
-                              height: 100,
-                              fit: BoxFit.cover,
-                              errorBuilder: (BuildContext context,
-                                  Object exception, StackTrace? stackTrace) {
-                                // 图片加载失败时显示的Widget
-                                return Icon(Icons.error);
-                              },
-                            ),
-                            SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(order.legalName,
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold)),
-                                  SizedBox(height: 5),
-                                  Text(order.serviceType,
-                                      style: TextStyle(
-                                          fontSize: 12, color: Colors.grey)),
-                                  SizedBox(height: 5),
-                                  Text(order.formattedDateRange,
-                                      style: TextStyle(
-                                          fontSize: 12, color: Colors.grey)),
-                                  SizedBox(height: 5),
-                                  Text(
-                                      'Total: \$${order.totalPrice.toStringAsFixed(2)}',
-                                      style: TextStyle(
-                                          fontSize: 12, color: Colors.grey)),
-                                ],
+                    itemCount: filteredOrders.length,
+                    itemBuilder: (context, index) {
+                      model.Order order = filteredOrders[index];
+                      return Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('商家名稱:${order.shopId}',
+                                        style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold)),
+                                    const SizedBox(height: 5),
+                                    Text('${order.serviceType}/ ${order.petType}',
+                                        style: const TextStyle(
+                                            fontSize: 12, color: Colors.grey)),
+                                    const SizedBox(height: 5),
+                                    Text(order.formattedDateRange,
+                                        style: const TextStyle(
+                                            fontSize: 12, color: Colors.grey)),
+                                    const SizedBox(height: 5),
+                                    Text('總價: ${order.totalPrice} 元',
+                                        style: const TextStyle(
+                                            fontSize: 12, color: Colors.grey)),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                );
+                      );
+                    });
               },
-              loading: () => Center(child: CircularProgressIndicator()),
-              error: (e, st) => Center(child: Text('Error: $e')),
+              loading: () => const CircularProgressIndicator(),
+              error: (err, stack) => Text('Error: $err'),
             ),
           ),
         ],
       ),
-      bottomNavigationBar:
-          NavigatorPage(), // Replace with your actual bottom navigation bar
+      bottomNavigationBar: const NavigatorPage(),
     );
   }
 }

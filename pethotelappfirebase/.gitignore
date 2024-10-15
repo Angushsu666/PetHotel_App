@@ -1,44 +1,37 @@
-# Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
+# macOS system files
 .DS_Store
+
+# Android build files
+**/android/app/build/
+**/android/gradle/wrapper/gradle-wrapper.properties
+
+# iOS build files
+**/ios/Podfile.lock
+**/ios/build/
+**/ios/Runner.xcodeproj/
+**/ios/Runner/Assets.xcassets/
+
+# Flutter assets (new images and temporary files)
+pethotelappfirebase/assets/
+pethotelappfirebase/lib/pages/searchbreedingpages/
+pethotelappfirebase/lib/pages/searchgroomingpages/
+pethotelappfirebase/lib/pages/searchhotelpages/
+
+# Flutter generated files
+**/linux/flutter/
+**/macos/Flutter/
+**/windows/flutter/
+pubspec.lock
+
+# Exclude any generated icons
+pethotelappfirebase/android/app/src/main/res/mipmap-*
+pethotelappfirebase/ios/Runner/Assets.xcassets/AppIcon.appiconset/*
+
+# Temporary files for your development environment
+.vscode/
 .atom/
-.buildlog/
 .history
-.svn/
-migrate_working_dir/
-
-# IntelliJ related
-*.iml
-*.ipr
-*.iws
 .idea/
-
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
-
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.packages
-.pub-cache/
-.pub/
-/build/
-
-# Symbolication related
-app.*.symbols
-
-# Obfuscation related
-app.*.map.json
-
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
+.svn/
+*.log
+*.swp

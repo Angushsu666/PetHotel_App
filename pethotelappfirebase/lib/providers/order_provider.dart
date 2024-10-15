@@ -7,7 +7,7 @@ final orderProvider = StreamProvider<List<model.Order>>((ref) {
     (snapshot) {
       return snapshot.docs.map((doc) {
         // 確保這裡使用 'model.Order'
-        return model.Order.fromMap(doc.data() as Map<String, dynamic>);
+        return model.Order.fromMap(doc.data());
       }).toList();
     },
   );

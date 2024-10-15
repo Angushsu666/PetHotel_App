@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/Message.dart'; // 假设您已经定义了 Message 类
 import 'package:rxdart/rxdart.dart';
 
@@ -20,7 +19,7 @@ class MessageProvider {
         .where('receiverLegalName', isEqualTo: shopName)
         .snapshots()
         .map((snapshot) => snapshot.docs
-            .map((doc) => Message.fromMap(doc.data() as Map<String, dynamic>))
+            .map((doc) => Message.fromMap(doc.data()))
             .toList());
 
     // 查询当前用户作为接收者的消息
@@ -30,7 +29,7 @@ class MessageProvider {
         .where('senderName', isEqualTo: shopName)
         .snapshots()
         .map((snapshot) => snapshot.docs
-            .map((doc) => Message.fromMap(doc.data() as Map<String, dynamic>))
+            .map((doc) => Message.fromMap(doc.data()))
             .toList());
 
     // 合并两个流并去重
@@ -60,7 +59,7 @@ class MessageProvider {
         .where('senderName', isEqualTo: currentUserName)
         .snapshots()
         .map((snapshot) => snapshot.docs
-            .map((doc) => Message.fromMap(doc.data() as Map<String, dynamic>))
+            .map((doc) => Message.fromMap(doc.data()))
             .toList());
 
     // 获取当前用户作为接收者的消息
@@ -69,7 +68,7 @@ class MessageProvider {
         .where('receiverLegalName', isEqualTo: currentUserName)
         .snapshots()
         .map((snapshot) => snapshot.docs
-            .map((doc) => Message.fromMap(doc.data() as Map<String, dynamic>))
+            .map((doc) => Message.fromMap(doc.data()))
             .toList());
 
     // 不使用集合来合并流
@@ -89,7 +88,7 @@ class MessageProvider {
         .orderBy('timestamp', descending: true) // 根据时间戳降序排列
         .snapshots()
         .map((snapshot) => snapshot.docs
-            .map((doc) => Message.fromMap(doc.data() as Map<String, dynamic>))
+            .map((doc) => Message.fromMap(doc.data()))
             .toList());
   }
 }

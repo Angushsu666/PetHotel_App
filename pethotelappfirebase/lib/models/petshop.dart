@@ -105,12 +105,13 @@ class petShop {
   final String introduction;
   final String serviceIntroduction;
   final List<Review> reviews;
-
-  // 改为 Map<String, bool> 类型
-  final Map<String, bool> roomCollection;
+  //住宿
+  final Map<String, Map<String, int>> roomCollection;
   final Map<String, bool> foodChoice;
   final Map<String, bool> serviceAndFacilities;
   final Map<String, bool> medicalNeeds;
+  //寵物美容
+  final Map<String, Map<String, int>> petGrooming;
 
   petShop({
     required this.id,
@@ -135,45 +136,50 @@ class petShop {
     required this.introduction,
     required this.serviceIntroduction,
     required this.reviews,
-    Map<String, bool>? roomCollection,
+    Map<String, Map<String, int>>? roomCollection,
     Map<String, bool>? foodChoice,
     Map<String, bool>? serviceAndFacilities,
     Map<String, bool>? medicalNeeds,
-  })  : this.roomCollection = roomCollection ??
+    Map<String, Map<String, int>>? petGrooming,
+  })  : roomCollection = roomCollection ??
             {
-              '獨立房型': false,
-              '開放式住宿': false,
-              '半開放式住宿': false,
+              '獨立房型': {'小型犬': 0, '中型犬': 0, '大型犬': 0, '貓': 0},
+              '開放式住宿': {'小型犬': 0, '中型犬': 0, '大型犬': 0, '貓': 0},
+              '半開放式住宿': {'小型犬': 0, '中型犬': 0, '大型犬': 0, '貓': 0},
             },
-        this.foodChoice = foodChoice ??
+        foodChoice = foodChoice ??
             {
               '鮮食': false,
               '罐頭': false,
               '乾飼料': false,
               '處方飼料': false,
             },
-        this.serviceAndFacilities = serviceAndFacilities ??
+        serviceAndFacilities = serviceAndFacilities ??
             {
               '24小時監控': false,
               '24小時寵物保姆': false,
               '開放式活動空間': false,
               '游泳池': false,
             },
-        this.medicalNeeds = medicalNeeds ??
+        medicalNeeds = medicalNeeds ??
             {
               '口服藥': false,
               '外傷藥': false,
               '陪伴看診': false,
+            },
+        petGrooming = petGrooming ??
+            {
+              '小美容': {'小型犬': 0, '中型犬': 0, '大型犬': 0, '貓': 0},
+              '大美容': {'小型犬': 0, '中型犬': 0, '大型犬': 0, '貓': 0},
             };
 
   factory petShop.fromJson(Map<String, dynamic> json) {
-    final Map<String, bool> roomCollectionData =
-        Map<String, bool>.from(json['roomCollection'] ??
-            {
-              '獨立房型': false,
-              '開放式住宿': false,
-              '半開放式住宿': false,
-            });
+    final roomCollectionJson =
+        json['roomCollection'] as Map<String, dynamic>? ?? {};
+
+    // 使用 .map() 转换每个字段的值，确保使用正确的类型
+    final roomCollection = roomCollectionJson
+        .map((key, value) => MapEntry(key, Map<String, int>.from(value)));
 
     final Map<String, bool> foodChoiceData =
         Map<String, bool>.from(json['foodChoice'] ??
@@ -200,7 +206,12 @@ class petShop {
               '外傷藥': false,
               '陪伴看診': false,
             });
+    final petGroomingJson =
+        json['roomCollection'] as Map<String, dynamic>? ?? {};
 
+    // 使用 .map() 转换每个字段的值，确保使用正确的类型
+    final petGrooming = petGroomingJson
+        .map((key, value) => MapEntry(key, Map<String, int>.from(value)));
     return petShop(
       id: json['ID'],
       legalType: json['legaltype'],
@@ -223,11 +234,12 @@ class petShop {
       price: json['price'] != null ? int.parse(json['price']) : 0,
       introduction: json['introduction'] ?? '',
       serviceIntroduction: json['serviceintroduction'] ?? '',
-      roomCollection: roomCollectionData,
       reviews: parseReviews(json['reviews']),
+      roomCollection: roomCollection,
       foodChoice: foodChoiceData,
       serviceAndFacilities: serviceAndFacilitiesData,
       medicalNeeds: medicalNeedsData,
+      petGrooming: petGrooming,
     );
   }
 
@@ -254,18 +266,26 @@ class petShop {
       'price': price,
       'introduction': introduction,
       'serviceintroduction': serviceIntroduction,
-      'roomCollection': roomCollection,
       'reviews': reviews.map((review) => review.toMap()).toList(),
+      'roomCollection': roomCollection,
       'foodChoice': foodChoice,
       'serviceAndFacilities': serviceAndFacilities,
       'medicalNeeds': medicalNeeds,
+      'petGrooming': petGrooming,
     };
   }
 
   factory petShop.fromMap(Map<String, dynamic> map) {
-    final Map<String, bool> roomCollectionData =
-        Map<String, bool>.from(map['roomCollection'] ?? {});
-
+    // 确保 roomCollection 不为空，如果为空则使用默认值
+    final roomCollectionJson = map['roomCollection'] as Map<String, dynamic>? ??
+        {
+          '獨立房型': {'小型犬': 0, '中型犬': 0, '大型犬': 0, '貓': 0},
+          '開放式住宿': {'小型犬': 0, '中型犬': 0, '大型犬': 0, '貓': 0},
+          '半開放式住宿': {'小型犬': 0, '中型犬': 0, '大型犬': 0, '貓': 0},
+        };
+    // 使用 .map() 转换各个字段的值
+    final roomCollection = roomCollectionJson
+        .map((key, value) => MapEntry(key, Map<String, int>.from(value)));
     final Map<String, bool> foodChoiceData =
         Map<String, bool>.from(map['foodChoice'] ?? {});
 
@@ -275,6 +295,14 @@ class petShop {
     final Map<String, bool> medicalNeedsData =
         Map<String, bool>.from(map['medicalNeeds'] ?? {});
 
+    final petGroomingJson = map['petGrooming'] as Map<String, dynamic>? ??
+        {
+          '小美容': {'小型犬': 0, '中型犬': 0, '大型犬': 0, '貓': 0},
+          '大美容': {'小型犬': 0, '中型犬': 0, '大型犬': 0, '貓': 0},
+        };
+    final petGrooming = petGroomingJson
+        .map((key, value) => MapEntry(key, Map<String, int>.from(value)));
+    // 返回 pet
     return petShop(
       id: map['id'] as String,
       legalType: map['legalType'] as String,
@@ -297,11 +325,12 @@ class petShop {
       price: map['price'] as int,
       introduction: map['introduction'] as String,
       serviceIntroduction: map['serviceIntroduction'] as String? ?? '',
-      roomCollection: roomCollectionData,
       reviews: parseReviews(map['reviews']),
+      roomCollection: roomCollection,
       foodChoice: foodChoiceData,
       serviceAndFacilities: serviceAndFacilitiesData,
       medicalNeeds: medicalNeedsData,
+      petGrooming: petGrooming,
     );
   }
 
@@ -331,10 +360,11 @@ class petShop {
     String? introduction,
     String? serviceIntroduction,
     List<Review>? reviews,
-    Map<String, bool>? roomCollection,
+    Map<String, Map<String, int>>? roomCollection,
     Map<String, bool>? foodChoice,
     Map<String, bool>? serviceAndFacilities,
     Map<String, bool>? medicalNeeds,
+    Map<String, Map<String, int>>? petGrooming,
   }) {
     return petShop(
       id: id ?? this.id,
@@ -363,6 +393,7 @@ class petShop {
       foodChoice: foodChoice ?? this.foodChoice,
       serviceAndFacilities: serviceAndFacilities ?? this.serviceAndFacilities,
       medicalNeeds: medicalNeeds ?? this.medicalNeeds,
+      petGrooming: petGrooming ?? this.petGrooming,
     );
   }
 }

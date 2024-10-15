@@ -1,4 +1,4 @@
-package com.example.pethotelappfirebase
+package com.unclecurly320.petserviceapp
 
 import io.flutter.embedding.android.FlutterActivity
 

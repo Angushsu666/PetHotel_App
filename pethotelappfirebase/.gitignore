@@ -1,37 +1,77 @@
-# macOS system files
+# Google API Key files
+*.json
+*google*.json
+
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
 .DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
 
-# Android build files
-**/android/app/build/
-**/android/gradle/wrapper/gradle-wrapper.properties
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
 
-# iOS build files
-**/ios/Podfile.lock
-**/ios/build/
-**/ios/Runner.xcodeproj/
-**/ios/Runner/Assets.xcassets/
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
 
-# Flutter assets (new images and temporary files)
-pethotelappfirebase/assets/
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+ios/Pods/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Generated Android specific files
+android/app/google-services.json
+android/gradle/wrapper/gradle-wrapper.properties
+
+# iOS specific files
+ios/Podfile.lock
+ios/build/
+ios/Runner.xcworkspace/
+ios/Runner.xcodeproj/project.pbxproj
+
+# Flutter-specific asset files (icons, images)
+pethotelappfirebase/assets/IOS1024x1024.png
+pethotelappfirebase/assets/android864x864.png
+pethotelappfirebase/assets/partnerAd1.png
+pethotelappfirebase/assets/partnerAd2.png
+pethotelappfirebase/assets/partnerAd3.png
+
+# Ignore any unwanted page files
+pethotelappfirebase/lib/pages/messageShopBox.dart
+pethotelappfirebase/lib/pages/searchSortPetHotel.dart
+pethotelappfirebase/lib/pages/searchSortPetHotelFilter.dart
+pethotelappfirebase/lib/pages/selectRoom*.dart
+pethotelappfirebase/lib/pages/signupwemail.dart
 pethotelappfirebase/lib/pages/searchbreedingpages/
 pethotelappfirebase/lib/pages/searchgroomingpages/
 pethotelappfirebase/lib/pages/searchhotelpages/
 
-# Flutter generated files
-**/linux/flutter/
-**/macos/Flutter/
-**/windows/flutter/
-pubspec.lock
-
-# Exclude any generated icons
-pethotelappfirebase/android/app/src/main/res/mipmap-*
-pethotelappfirebase/ios/Runner/Assets.xcassets/AppIcon.appiconset/*
-
-# Temporary files for your development environment
-.vscode/
-.atom/
-.history
-.idea/
-.svn/
-*.log
-*.swp
